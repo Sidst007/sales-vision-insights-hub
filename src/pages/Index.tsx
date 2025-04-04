@@ -1,17 +1,32 @@
 
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
 const Index = () => {
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    navigate('/dashboard');
-  }, [navigate]);
-  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-sales-lightest">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sales-primary"></div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-sales-lightest p-4">
+      <div className="text-center max-w-md">
+        <h1 className="text-4xl font-bold text-sales-primary mb-2">SalesVision</h1>
+        <p className="text-xl text-sales-dark mb-6">Insights Hub for FMCG Sales Teams</p>
+        
+        <p className="text-muted-foreground mb-8">
+          Welcome to your comprehensive platform for tracking and analyzing sales performance in the
+          Fast-Moving Consumer Goods industry.
+        </p>
+        
+        <Button 
+          className="bg-sales-primary hover:bg-sales-dark flex items-center gap-2" 
+          size="lg"
+          asChild
+        >
+          <Link to="/dashboard">
+            <span>Go to Dashboard</span>
+            <ArrowRight size={16} />
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 };
