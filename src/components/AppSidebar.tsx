@@ -10,7 +10,9 @@ import {
   ShoppingBag, 
   FileText, 
   Settings, 
-  Home
+  Home,
+  FileInput,
+  User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -40,11 +42,17 @@ const navItems: NavItem[] = [
     title: 'Dashboard',
     path: '/dashboard',
     icon: Home,
+    roles: [UserRole.TSM, UserRole.ASE, UserRole.KAM, UserRole.ADMIN]
+  },
+  {
+    title: 'Data Input',
+    path: '/data-input',
+    icon: FileInput,
     roles: [UserRole.TSM, UserRole.ASE, UserRole.DSR, UserRole.KAM, UserRole.RSO, UserRole.ADMIN]
   },
   {
-    title: 'Sales Analytics',
-    path: '/analytics',
+    title: 'Owner\'s Dashboard',
+    path: '/owner-dashboard',
     icon: BarChart4,
     roles: [UserRole.TSM, UserRole.ASE, UserRole.KAM, UserRole.ADMIN]
   },
@@ -83,6 +91,12 @@ const navItems: NavItem[] = [
     path: '/reports',
     icon: FileText,
     roles: [UserRole.TSM, UserRole.ASE, UserRole.KAM, UserRole.ADMIN]
+  },
+  {
+    title: 'My Profile',
+    path: '/profile',
+    icon: User,
+    roles: [UserRole.TSM, UserRole.ASE, UserRole.DSR, UserRole.KAM, UserRole.RSO, UserRole.ADMIN]
   },
   {
     title: 'Settings',

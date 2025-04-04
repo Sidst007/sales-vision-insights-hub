@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import AppSidebar from './AppSidebar';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, UserRole } from '@/contexts/AuthContext';
 import LoginPage from '@/pages/LoginPage';
 
 const Layout: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -19,6 +19,18 @@ const Layout: React.FC = () => {
 
   if (!isAuthenticated) {
     return <LoginPage />;
+  }
+
+  // Redirect employees to the data input page when they first log in
+  if (user?.role === UserRole.DSR || user?.role === UserRole.RSO) {
+    // We'll check if the user is trying to access a restricted page and redirect if needed
+    const path = window.location.pathname;
+    const employeeAllowedPaths = ['/data-input', '/profile', '/products'];
+    const isAllowedPath = employeeAllowedPaths.some(allowedPath => path.startsWith(allowedPath));
+    
+    if (!isAllowedPath && path !== '/') {
+      return <Navigate to="/data-input" replace />;
+    }
   }
 
   return (

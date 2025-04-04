@@ -9,6 +9,8 @@ import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import DashboardPage from "./pages/DashboardPage";
 import TeamPage from "./pages/TeamPage";
+import DataInputPage from "./pages/DataInputPage";
+import OwnerDashboardPage from "./pages/OwnerDashboardPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,8 @@ const App = () => (
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/team" element={<TeamPage />} />
+              <Route path="/data-input" element={<DataInputPage />} />
+              <Route path="/owner-dashboard" element={<OwnerDashboardPage />} />
               {/* Placeholder routes for future implementation */}
               <Route path="/analytics" element={<DashboardPage />} />
               <Route path="/targets" element={<DashboardPage />} />
