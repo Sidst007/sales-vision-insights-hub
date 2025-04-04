@@ -8,7 +8,7 @@ import {
   CardHeader, 
   CardTitle
 } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { CustomProgress } from '@/components/ui/custom-progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { formatPercentage, formatCurrency, getPerformanceColor } from '@/utils/data-utils';
 import { generateTeamData, generateTerritoryData } from '@/data/mockData';
@@ -60,7 +60,7 @@ const TeamPage: React.FC = () => {
                     {formatPercentage(averagePerformance)}
                   </div>
                 </div>
-                <Progress 
+                <CustomProgress 
                   value={averagePerformance} 
                   className="h-2" 
                   indicatorClassName={
@@ -155,7 +155,7 @@ const TeamPage: React.FC = () => {
                           {formatPercentage(member.performance)}
                         </span>
                         <div className="w-24 mt-1">
-                          <Progress 
+                          <CustomProgress 
                             value={(member.performance / member.target) * 100} 
                             className="h-1.5" 
                             indicatorClassName={
@@ -192,7 +192,7 @@ const TeamPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  <Progress 
+                  <CustomProgress 
                     value={territory.performance} 
                     className="h-2 mb-4" 
                     indicatorClassName={

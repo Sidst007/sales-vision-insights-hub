@@ -9,7 +9,7 @@ import {
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { CustomProgress } from '@/components/ui/custom-progress';
 import { 
   BarChart, 
   Bar, 
@@ -106,7 +106,7 @@ const DashboardPage: React.FC = () => {
                   {renderTrend(performanceMetrics[0].change)}
                 </div>
               </div>
-              <Progress 
+              <CustomProgress 
                 value={salesSummary.targetCompletion} 
                 className="h-2 mt-2" 
                 indicatorClassName={salesSummary.targetCompletion >= 100 ? "bg-sales-success" : "bg-sales-primary"}
@@ -272,7 +272,7 @@ const DashboardPage: React.FC = () => {
                     </div>
                   </div>
                   
-                  <Progress 
+                  <CustomProgress 
                     value={(metric.value / metric.target) * 100} 
                     className="h-2" 
                     indicatorClassName={
