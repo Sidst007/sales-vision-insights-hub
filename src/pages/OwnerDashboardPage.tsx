@@ -128,7 +128,7 @@ const OwnerDashboardPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(
-                teamData.reduce((acc, member) => acc + (member.sales || 50000), 0)
+                teamData.reduce((acc, member) => acc + (member.sales || 0), 0)
               )}</div>
               <div className="flex justify-between mt-1 text-sm">
                 <div className="text-muted-foreground">YTD</div>
@@ -268,19 +268,19 @@ const OwnerDashboardPage: React.FC = () => {
                           <div className="grid grid-cols-2 gap-2 text-sm">
                             <div>
                               <div className="text-muted-foreground">Total Sales</div>
-                              <div className="font-medium">{formatCurrency(member.sales || 50000)}</div>
+                              <div className="font-medium">{formatCurrency(member.sales || 0)}</div>
                             </div>
                             <div>
                               <div className="text-muted-foreground">New Accounts</div>
-                              <div className="font-medium">{member.newAccounts || 12}</div>
+                              <div className="font-medium">{member.newAccounts || 0}</div>
                             </div>
                             <div>
                               <div className="text-muted-foreground">Calls Made</div>
-                              <div className="font-medium">{member.calls || 156}</div>
+                              <div className="font-medium">{member.calls || 0}</div>
                             </div>
                             <div>
                               <div className="text-muted-foreground">Meetings</div>
-                              <div className="font-medium">{member.meetings || 28}</div>
+                              <div className="font-medium">{member.meetings || 0}</div>
                             </div>
                           </div>
                         </CardContent>

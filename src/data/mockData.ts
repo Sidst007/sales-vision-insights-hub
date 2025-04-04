@@ -1,4 +1,3 @@
-
 import { UserRole } from '@/contexts/AuthContext';
 import { getRandomInRange, getLastNMonths } from '@/utils/data-utils';
 
@@ -49,10 +48,14 @@ export interface TeamMember {
   id: string;
   name: string;
   role: string;
+  region: string;
   avatar: string;
   performance: number;
   target: number;
-  region: string;
+  sales?: number;
+  newAccounts?: number;
+  calls?: number;
+  meetings?: number;
 }
 
 // Territory interface
