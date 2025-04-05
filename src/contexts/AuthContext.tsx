@@ -21,6 +21,11 @@ export interface User {
   avatar?: string;
   region?: string;
   territory?: string;
+  phone?: string;
+  address?: string;
+  joined?: string;
+  target?: number;
+  performance?: number;
 }
 
 // Auth context interface
@@ -31,66 +36,97 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   error: string | null;
+  updateUserProfile: (updatedInfo: Partial<User>) => void;
 }
 
 // Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Sample users for the demo
+// Sample users for the demo with Indian names
 const SAMPLE_USERS: User[] = [
   {
     id: "1",
-    name: "John Smith",
+    name: "Rajesh Kumar",
     email: "tsm@example.com",
     role: UserRole.TSM,
-    avatar: "https://i.pravatar.cc/300?img=1",
+    avatar: "https://i.pravatar.cc/300?img=11",
     region: "North",
-    territory: "Delhi-NCR"
+    territory: "Delhi-NCR",
+    phone: "+91 9876543210",
+    address: "42 Rajouri Garden, New Delhi",
+    joined: "2022-05-15",
+    target: 500000,
+    performance: 93
   },
   {
     id: "2",
-    name: "Emily Johnson",
+    name: "Priya Sharma",
     email: "ase@example.com",
     role: UserRole.ASE,
-    avatar: "https://i.pravatar.cc/300?img=2",
+    avatar: "https://i.pravatar.cc/300?img=5",
     region: "South",
-    territory: "Bangalore"
+    territory: "Bangalore",
+    phone: "+91 8765432109",
+    address: "78 Indiranagar, Bangalore",
+    joined: "2022-08-22",
+    target: 350000,
+    performance: 105
   },
   {
     id: "3",
-    name: "Ravi Kumar",
+    name: "Vikram Patel",
     email: "dsr@example.com",
     role: UserRole.DSR,
     avatar: "https://i.pravatar.cc/300?img=3",
     region: "West",
-    territory: "Mumbai"
+    territory: "Mumbai",
+    phone: "+91 7654321098",
+    address: "23 Bandra West, Mumbai",
+    joined: "2023-01-10",
+    target: 250000,
+    performance: 87
   },
   {
     id: "4",
-    name: "Sarah Williams",
+    name: "Sunita Reddy",
     email: "kam@example.com",
     role: UserRole.KAM,
-    avatar: "https://i.pravatar.cc/300?img=4",
+    avatar: "https://i.pravatar.cc/300?img=9",
     region: "East",
-    territory: "Kolkata"
+    territory: "Kolkata",
+    phone: "+91 6543210987",
+    address: "56 Salt Lake City, Kolkata",
+    joined: "2022-11-05",
+    target: 600000,
+    performance: 96
   },
   {
     id: "5",
-    name: "Aarav Patel",
+    name: "Arjun Singh",
     email: "rso@example.com",
     role: UserRole.RSO,
-    avatar: "https://i.pravatar.cc/300?img=5",
+    avatar: "https://i.pravatar.cc/300?img=7",
     region: "Central",
-    territory: "Nagpur"
+    territory: "Nagpur",
+    phone: "+91 5432109876",
+    address: "12 Civil Lines, Nagpur",
+    joined: "2023-03-20",
+    target: 200000,
+    performance: 82
   },
   {
     id: "6",
-    name: "Admin User",
+    name: "Meera Joshi",
     email: "admin@example.com",
     role: UserRole.ADMIN,
     avatar: "https://i.pravatar.cc/300?img=8",
     region: "All",
-    territory: "All"
+    territory: "All",
+    phone: "+91 9876543211",
+    address: "Corporate HQ, Mumbai",
+    joined: "2022-01-15",
+    target: 1000000,
+    performance: 100
   }
 ];
 
@@ -108,6 +144,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setIsLoading(false);
   }, []);
+
+  // Update user profile
+  const updateUserProfile = (updatedInfo: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...updatedInfo };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      toast.success('Profile updated successfully');
+    }
+  };
 
   // Login function - simulates authentication
   const login = async (email: string, password: string) => {
@@ -148,7 +194,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated: !!user,
     login,
     logout,
-    error
+    error,
+    updateUserProfile
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
