@@ -32,10 +32,10 @@ import { Calendar, Phone, FileText, Users, Target } from 'lucide-react';
 
 // Define form schema
 const formSchema = z.object({
-  callsMade: z.string().min(1, { message: "Number of calls is required" }).transform(val => parseInt(val, 10)),
-  meetings: z.string().min(1, { message: "Number of meetings is required" }).transform(val => parseInt(val, 10)),
-  salesAmount: z.string().min(1, { message: "Sales amount is required" }).transform(val => parseFloat(val)),
-  newAccounts: z.string().min(1, { message: "Number of new accounts is required" }).transform(val => parseInt(val, 10)),
+  callsMade: z.coerce.number().min(0, { message: "Number of calls is required" }),
+  meetings: z.coerce.number().min(0, { message: "Number of meetings is required" }),
+  salesAmount: z.coerce.number().min(0, { message: "Sales amount is required" }),
+  newAccounts: z.coerce.number().min(0, { message: "Number of new accounts is required" }),
   notes: z.string().optional(),
 });
 
@@ -63,10 +63,10 @@ const DataInputPage: React.FC = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      callsMade: "",
-      meetings: "",
-      salesAmount: "",
-      newAccounts: "",
+      callsMade: 0,
+      meetings: 0,
+      salesAmount: 0,
+      newAccounts: 0,
       notes: ""
     }
   });
@@ -88,10 +88,10 @@ const DataInputPage: React.FC = () => {
       
       // Reset form
       form.reset({
-        callsMade: "",
-        meetings: "",
-        salesAmount: "",
-        newAccounts: "",
+        callsMade: 0,
+        meetings: 0,
+        salesAmount: 0,
+        newAccounts: 0,
         notes: ""
       });
       
