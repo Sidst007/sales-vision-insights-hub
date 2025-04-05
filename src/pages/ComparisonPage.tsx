@@ -35,7 +35,8 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-  Legend
+  Legend,
+  Cell
 } from 'recharts';
 import {
   ChartContainer,

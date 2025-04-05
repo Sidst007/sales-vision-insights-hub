@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -46,16 +45,31 @@ import {
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  region: string;
+  territory: string;
+  performance: number;
+  target: number;
+  sales?: number;
+  avatar: string;
+  calls?: number;
+  meetings?: number;
+  newAccounts?: number;
+  email?: string;
+  phone?: string;
+}
+
 const EmployeeDetailPage: React.FC = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   
-  // Get team data
   const teamData = generateTeamData();
   const employeeData = teamData.find(member => member.id === employeeId);
   
-  // Redirect if not admin or employee not found
   if (user?.role !== UserRole.ADMIN) {
     navigate('/dashboard');
     return null;
@@ -66,7 +80,6 @@ const EmployeeDetailPage: React.FC = () => {
     return null;
   }
   
-  // Generate monthly performance data
   const generateMonthlyData = () => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const currentMonth = new Date().getMonth();
@@ -83,7 +96,6 @@ const EmployeeDetailPage: React.FC = () => {
     });
   };
   
-  // Generate daily activity data
   const generateDailyData = () => {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
     return days.map(day => ({
@@ -94,7 +106,6 @@ const EmployeeDetailPage: React.FC = () => {
     }));
   };
   
-  // Generate comparison data against peers
   const generateComparisonData = () => {
     const categories = ['Sales', 'Meetings', 'Calls', 'New Accounts', 'Retention'];
     
@@ -132,7 +143,6 @@ const EmployeeDetailPage: React.FC = () => {
           </Button>
         </div>
         
-        {/* Employee Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <Card className="md:col-span-1">
             <CardHeader>
@@ -245,7 +255,6 @@ const EmployeeDetailPage: React.FC = () => {
           </Card>
         </div>
         
-        {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card className="card-hover">
             <CardHeader className="pb-2">
@@ -343,7 +352,6 @@ const EmployeeDetailPage: React.FC = () => {
           </Card>
         </div>
         
-        {/* Detailed Analysis */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <Card>
             <CardHeader>
@@ -418,7 +426,6 @@ const EmployeeDetailPage: React.FC = () => {
           </Card>
         </div>
         
-        {/* Action Recommendations */}
         <Card className="mb-6 border-l-4 border-l-sales-primary">
           <CardContent className="p-6">
             <div className="flex items-start">

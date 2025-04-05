@@ -49,6 +49,7 @@ export interface TeamMember {
   name: string;
   role: string;
   region: string;
+  territory: string;
   avatar: string;
   performance: number;
   target: number;
@@ -56,6 +57,8 @@ export interface TeamMember {
   newAccounts?: number;
   calls?: number;
   meetings?: number;
+  email?: string;
+  phone?: string;
 }
 
 // Territory interface
@@ -234,19 +237,47 @@ export const generateMonthlySalesData = (): { name: string; sales: number; targe
 export const generateTeamData = (): TeamMember[] => {
   const roles = ['Sales Representative', 'Area Manager', 'Account Executive'];
   const regions = ['North', 'South', 'East', 'West', 'Central'];
+  const territories = ['Delhi NCR', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata'];
   
   return Array.from({ length: 5 }, (_, i) => {
-    const target = getRandomInRange(80, 100);
+    const target = getRandomInRange(80, 100) * 10000;
     const performance = getRandomInRange(70, 110);
+    const sales = Math.round(target * (performance/100));
+    const calls = getRandomInRange(50, 200);
+    const meetings = getRandomInRange(10, 40);
+    const newAccounts = getRandomInRange(2, 15);
+    
+    // Indian names for team members
+    const names = [
+      'Rahul Sharma', 
+      'Priya Patel', 
+      'Amit Singh', 
+      'Deepika Verma', 
+      'Vikram Mehta'
+    ];
+    
+    // Generate email based on name
+    const nameParts = names[i].split(' ');
+    const email = `${nameParts[0].toLowerCase()}.${nameParts[1].toLowerCase()}@example.com`;
+    
+    // Generate Indian phone number
+    const phone = `+91 ${getRandomInRange(7000000000, 9999999999)}`;
     
     return {
       id: `TM${i + 1}`,
-      name: ['Alex Johnson', 'Priya Sharma', 'Michael Chen', 'Emma Wilson', 'Raj Patel'][i],
+      name: names[i],
       role: roles[i % roles.length],
+      region: regions[i % regions.length],
+      territory: territories[i % territories.length],
       avatar: `https://i.pravatar.cc/150?img=${i + 10}`,
       performance,
       target,
-      region: regions[i % regions.length]
+      sales,
+      calls,
+      meetings,
+      newAccounts,
+      email,
+      phone
     };
   });
 };
