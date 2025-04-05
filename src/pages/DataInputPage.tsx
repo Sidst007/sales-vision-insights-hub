@@ -78,7 +78,7 @@ const DataInputPage: React.FC = () => {
     // This is where you would send the data to your backend
     // For now, we'll simulate a successful submission
     setTimeout(() => {
-      // Update current metrics
+      // Update current metrics with the parsed number values from the form
       setCurrentMetrics(prev => ({
         calls: prev.calls + data.callsMade,
         meetings: prev.meetings + data.meetings,
