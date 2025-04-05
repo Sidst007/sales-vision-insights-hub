@@ -59,6 +59,9 @@ export interface TeamMember {
   meetings?: number;
   email?: string;
   phone?: string;
+  manager?: string;
+  managerId?: string;
+  directReports?: string[];
 }
 
 // Territory interface
@@ -82,14 +85,31 @@ export interface Account {
   status: string;
 }
 
+// PeerEngagement interface
+export interface PeerEngagement {
+  id: string;
+  employeeId: string;
+  employeeName: string;
+  metrics: {
+    salesContribution: number;
+    targetCompletion: number;
+    teamCollaboration: number;
+    knowledgeSharing: number;
+    overallEngagement: number;
+  };
+  ranking: number;
+  trend: 'up' | 'down' | 'stable';
+  lastUpdated: Date;
+}
+
 // Generate role-specific sales summary
 export const generateSalesSummary = (role: UserRole): SalesSummary => {
   const baseMultiplier = {
     [UserRole.TSM]: 1000000,
     [UserRole.ASE]: 500000,
-    [UserRole.DSR]: 300000,
+    [UserRole.ASM]: 300000,
+    [UserRole.SR]: 100000,
     [UserRole.KAM]: 2000000,
-    [UserRole.RSO]: 100000,
     [UserRole.ADMIN]: 5000000,
   }[role] || 500000;
   
@@ -233,80 +253,193 @@ export const generateMonthlySalesData = (): { name: string; sales: number; targe
   });
 };
 
-// Generate team members data
-export const generateTeamData = (): TeamMember[] => {
-  const roles = ['Sales Representative', 'Area Manager', 'Account Executive'];
-  const regions = ['North', 'South', 'East', 'West', 'Central'];
-  const territories = ['Delhi NCR', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata'];
+// Generate team members data for hierarchy
+export const generateTeamData = (userRole?: UserRole, userId?: string): TeamMember[] => {
+  const teamData: TeamMember[] = [
+    {
+      id: "tsm1",
+      name: "Rajesh Kumar",
+      role: "Territory Sales Manager",
+      region: "North",
+      territory: "Delhi-NCR",
+      avatar: "https://i.pravatar.cc/300?img=11",
+      performance: 93,
+      target: 500000,
+      sales: 465000,
+      calls: getRandomInRange(150, 250),
+      meetings: getRandomInRange(30, 50),
+      newAccounts: getRandomInRange(8, 20),
+      email: "tsm1@example.com",
+      phone: "+91 9876543210",
+      directReports: ["ase1", "ase2", "ase3"]
+    },
+    {
+      id: "tsm2",
+      name: "Anita Desai",
+      role: "Territory Sales Manager",
+      region: "South",
+      territory: "Bangalore",
+      avatar: "https://i.pravatar.cc/300?img=1",
+      performance: 95,
+      target: 550000,
+      sales: 522500,
+      calls: getRandomInRange(140, 230),
+      meetings: getRandomInRange(25, 45),
+      newAccounts: getRandomInRange(7, 18),
+      email: "tsm2@example.com",
+      phone: "+91 9876543209",
+      directReports: ["ase4", "ase5", "ase6"]
+    },
+    
+    {
+      id: "ase1",
+      name: "Priya Sharma",
+      role: "Area Sales Executive",
+      region: "North",
+      territory: "Delhi",
+      avatar: "https://i.pravatar.cc/300?img=5",
+      performance: 105,
+      target: 350000,
+      sales: 367500,
+      calls: getRandomInRange(120, 200),
+      meetings: getRandomInRange(20, 40),
+      newAccounts: getRandomInRange(5, 15),
+      email: "ase1@example.com",
+      phone: "+91 8765432109",
+      manager: "Rajesh Kumar",
+      managerId: "tsm1",
+      directReports: ["asm1", "asm2"]
+    },
+    {
+      id: "ase2",
+      name: "Amit Patel",
+      role: "Area Sales Executive",
+      region: "North",
+      territory: "Gurgaon",
+      avatar: "https://i.pravatar.cc/300?img=12",
+      performance: 97,
+      target: 340000,
+      sales: 329800,
+      calls: getRandomInRange(110, 190),
+      meetings: getRandomInRange(18, 38),
+      newAccounts: getRandomInRange(4, 14),
+      email: "ase2@example.com",
+      phone: "+91 8765432108",
+      manager: "Rajesh Kumar",
+      managerId: "tsm1",
+      directReports: ["asm3", "asm4"]
+    }
+  ];
   
-  return Array.from({ length: 5 }, (_, i) => {
-    const target = getRandomInRange(80, 100) * 10000;
-    const performance = getRandomInRange(70, 110);
-    const sales = Math.round(target * (performance/100));
-    const calls = getRandomInRange(50, 200);
-    const meetings = getRandomInRange(10, 40);
-    const newAccounts = getRandomInRange(2, 15);
-    
-    // Indian names for team members
-    const names = [
-      'Rahul Sharma', 
-      'Priya Patel', 
-      'Amit Singh', 
-      'Deepika Verma', 
-      'Vikram Mehta'
-    ];
-    
-    // Generate email based on name
-    const nameParts = names[i].split(' ');
-    const email = `${nameParts[0].toLowerCase()}.${nameParts[1].toLowerCase()}@example.com`;
-    
-    // Generate Indian phone number
-    const phone = `+91 ${getRandomInRange(7000000000, 9999999999)}`;
-    
-    return {
-      id: `TM${i + 1}`,
-      name: names[i],
-      role: roles[i % roles.length],
-      region: regions[i % regions.length],
-      territory: territories[i % territories.length],
-      avatar: `https://i.pravatar.cc/150?img=${i + 10}`,
-      performance,
-      target,
-      sales,
-      calls,
-      meetings,
-      newAccounts,
-      email,
-      phone
-    };
-  });
+  if (userRole && userId) {
+    if (userRole === UserRole.ADMIN) {
+      return teamData;
+    } else if (userRole === UserRole.TSM) {
+      const ownData = teamData.find(member => member.id === userId);
+      if (!ownData) return [];
+      
+      const directReports = ownData.directReports || [];
+      return [
+        ownData,
+        ...teamData.filter(member => directReports.includes(member.id) || member.managerId === userId)
+      ];
+    } else if (userRole === UserRole.ASE || userRole === UserRole.ASM) {
+      const ownData = teamData.find(member => member.id === userId);
+      if (!ownData) return [];
+      
+      const directReports = ownData.directReports || [];
+      return [
+        ownData,
+        ...teamData.filter(member => directReports.includes(member.id) || member.managerId === userId)
+      ];
+    } else {
+      return teamData.filter(member => member.id === userId);
+    }
+  }
+  
+  return teamData;
 };
 
 // Generate territory data
-export const generateTerritoryData = (): Territory[] => {
-  const territories = ['Delhi NCR', 'Mumbai', 'Bangalore', 'Chennai', 'Kolkata', 'Hyderabad'];
-  const managers = ['Rahul Singh', 'Amrita Patel', 'Suresh Kumar', 'Priya Sharma', 'Vikram Mehta', 'Deepa Reddy'];
+export const generateTerritoryData = (userRole?: UserRole, userId?: string): Territory[] => {
+  const territories = [
+    {
+      id: "t1",
+      name: "Delhi-NCR",
+      manager: "Rajesh Kumar",
+      sales: getRandomInRange(800000, 1200000),
+      target: 1000000,
+      performance: getRandomInRange(80, 110),
+      growth: getRandomInRange(-10, 20)
+    },
+    {
+      id: "t2",
+      name: "Bangalore",
+      manager: "Anita Desai",
+      sales: getRandomInRange(850000, 1300000),
+      target: 1100000,
+      performance: getRandomInRange(85, 115),
+      growth: getRandomInRange(-5, 25)
+    },
+    {
+      id: "t3",
+      name: "Mumbai",
+      manager: "Vikram Mehta",
+      sales: getRandomInRange(900000, 1400000),
+      target: 1200000,
+      performance: getRandomInRange(75, 105),
+      growth: getRandomInRange(-8, 18)
+    },
+    {
+      id: "t4",
+      name: "Chennai",
+      manager: "Deepak Nair",
+      sales: getRandomInRange(750000, 1150000),
+      target: 950000,
+      performance: getRandomInRange(78, 108),
+      growth: getRandomInRange(-12, 15)
+    },
+    {
+      id: "t5",
+      name: "Kolkata",
+      manager: "Sunita Reddy",
+      sales: getRandomInRange(700000, 1100000),
+      target: 900000,
+      performance: getRandomInRange(76, 106),
+      growth: getRandomInRange(-15, 12)
+    },
+    {
+      id: "t6",
+      name: "Hyderabad",
+      manager: "Rahul Sharma",
+      sales: getRandomInRange(780000, 1180000),
+      target: 980000,
+      performance: getRandomInRange(82, 112),
+      growth: getRandomInRange(-7, 22)
+    }
+  ];
   
-  return territories.map((name, i) => {
-    const target = getRandomInRange(800000, 1200000);
-    const performance = getRandomInRange(80, 110) / 100;
-    const sales = Math.round(target * performance);
-    const growth = getRandomInRange(-10, 20);
-    
-    return {
-      id: `T${i + 1}`,
-      name,
-      manager: managers[i],
-      sales,
-      target,
-      performance: performance * 100,
-      growth
-    };
-  });
+  if (userRole && userId) {
+    if (userRole === UserRole.ADMIN) {
+      return territories;
+    } else if (userRole === UserRole.TSM) {
+      const userData = generateTeamData().find(member => member.id === userId);
+      if (!userData) return [];
+      
+      return territories.filter(territory => 
+        territory.name === userData.territory || 
+        territory.manager === userData.name
+      );
+    } else {
+      return [];
+    }
+  }
+  
+  return territories;
 };
 
 // Generate accounts data
-export const generateAccountsData = (): Account[] => {
+export const generateAccountsData = (userRole?: UserRole, userId?: string): Account[] => {
   const names = [
     'BigMart Retail', 'SuperStore Chain', 'QuickShop', 'ValueMart', 
     'FreshGrocer', 'MegaMall', 'EasyShop', 'PrimeBazaar'
@@ -314,6 +447,26 @@ export const generateAccountsData = (): Account[] => {
   
   const types = ['Key Account', 'Distributor', 'Retail Chain', 'Wholesaler'];
   const statuses = ['Active', 'Inactive', 'New', 'At Risk'];
+  
+  if (userRole && userId) {
+    if (userRole === UserRole.ADMIN) {
+      return names.map((name, i) => {
+        const lastOrder = new Date();
+        lastOrder.setDate(lastOrder.getDate() - getRandomInRange(1, 30));
+        
+        return {
+          id: `A${i + 1}`,
+          name,
+          type: types[i % types.length],
+          sales: getRandomInRange(100000, 500000),
+          lastOrder,
+          status: statuses[i % statuses.length]
+        };
+      });
+    } else {
+      return [];
+    }
+  }
   
   return names.map((name, i) => {
     const lastOrder = new Date();
@@ -327,5 +480,60 @@ export const generateAccountsData = (): Account[] => {
       lastOrder,
       status: statuses[i % statuses.length]
     };
+  });
+};
+
+// Generate peer engagement data
+export const generatePeerEngagementData = (userRole?: UserRole, userId?: string): PeerEngagement[] => {
+  const teamData = generateTeamData();
+  
+  return teamData.map((member, index) => {
+    const metrics = {
+      salesContribution: getRandomInRange(70, 100),
+      targetCompletion: getRandomInRange(75, 105),
+      teamCollaboration: getRandomInRange(60, 95),
+      knowledgeSharing: getRandomInRange(65, 90),
+      overallEngagement: 0
+    };
+    
+    metrics.overallEngagement = Math.round(
+      (metrics.salesContribution + metrics.targetCompletion + 
+       metrics.teamCollaboration + metrics.knowledgeSharing) / 4
+    );
+    
+    const ranking = index + 1;
+    
+    const trendOptions: ('up' | 'down' | 'stable')[] = ['up', 'down', 'stable'];
+    const trend = trendOptions[Math.floor(Math.random() * 3)];
+    
+    return {
+      id: `pe-${member.id}`,
+      employeeId: member.id,
+      employeeName: member.name,
+      metrics,
+      ranking,
+      trend,
+      lastUpdated: new Date()
+    };
+  })
+  .sort((a, b) => b.metrics.overallEngagement - a.metrics.overallEngagement)
+  .map((item, index) => ({
+    ...item,
+    ranking: index + 1
+  }))
+  .filter(item => {
+    if (!userRole || !userId) return true;
+    
+    if (userRole === UserRole.ADMIN) {
+      return true;
+    } else if (userRole === UserRole.TSM) {
+      const tsmData = teamData.find(m => m.id === userId);
+      return tsmData?.directReports?.includes(item.employeeId) || item.employeeId === userId;
+    } else if (userRole === UserRole.ASE || userRole === UserRole.ASM) {
+      const userData = teamData.find(m => m.id === userId);
+      return userData?.directReports?.includes(item.employeeId) || item.employeeId === userId;
+    } else {
+      return item.employeeId === userId;
+    }
   });
 };

@@ -42,61 +42,61 @@ const navItems: NavItem[] = [
     title: 'Dashboard',
     path: '/dashboard',
     icon: Home,
-    roles: [UserRole.TSM, UserRole.ASE, UserRole.KAM, UserRole.ADMIN]
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE, UserRole.ASM, UserRole.KAM]
   },
   {
     title: 'Data Input',
     path: '/data-input',
     icon: FileInput,
-    roles: [UserRole.TSM, UserRole.ASE, UserRole.DSR, UserRole.KAM, UserRole.RSO, UserRole.ADMIN]
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE, UserRole.ASM, UserRole.SR, UserRole.KAM]
   },
   {
     title: 'Owner\'s Dashboard',
     path: '/owner-dashboard',
     icon: BarChart4,
-    roles: [UserRole.TSM, UserRole.ASE, UserRole.KAM, UserRole.ADMIN]
+    roles: [UserRole.ADMIN]
   },
   {
     title: 'Team Performance',
     path: '/team',
     icon: Users,
-    roles: [UserRole.TSM, UserRole.ASE, UserRole.KAM, UserRole.ADMIN]
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE, UserRole.ASM]
   },
   {
     title: 'Sales Targets',
     path: '/targets',
     icon: Target,
-    roles: [UserRole.TSM, UserRole.ASE, UserRole.DSR, UserRole.KAM, UserRole.RSO, UserRole.ADMIN]
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE, UserRole.ASM, UserRole.SR, UserRole.KAM]
   },
   {
     title: 'Compensation',
     path: '/compensation',
     icon: DollarSign,
-    roles: [UserRole.TSM, UserRole.ASE, UserRole.DSR, UserRole.KAM, UserRole.RSO, UserRole.ADMIN]
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE, UserRole.ASM, UserRole.SR, UserRole.KAM]
   },
   {
     title: 'Accounts',
     path: '/accounts',
     icon: Briefcase,
-    roles: [UserRole.KAM, UserRole.TSM, UserRole.ADMIN]
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.KAM]
   },
   {
     title: 'Products',
     path: '/products',
     icon: ShoppingBag,
-    roles: [UserRole.TSM, UserRole.ASE, UserRole.DSR, UserRole.KAM, UserRole.RSO, UserRole.ADMIN]
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE, UserRole.ASM, UserRole.SR, UserRole.KAM]
   },
   {
     title: 'Reports',
     path: '/reports',
     icon: FileText,
-    roles: [UserRole.TSM, UserRole.ASE, UserRole.KAM, UserRole.ADMIN]
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE, UserRole.ASM, UserRole.KAM]
   },
   {
     title: 'My Profile',
     path: '/profile',
     icon: User,
-    roles: [UserRole.TSM, UserRole.ASE, UserRole.DSR, UserRole.KAM, UserRole.RSO, UserRole.ADMIN]
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE, UserRole.ASM, UserRole.SR, UserRole.KAM]
   },
   {
     title: 'Settings',

@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import AppSidebar from './AppSidebar';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
@@ -8,6 +8,42 @@ import LoginPage from '@/pages/LoginPage';
 
 const Layout: React.FC = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Define role-based access paths
+  const roleBasedPaths = {
+    [UserRole.ADMIN]: ['/dashboard', '/owner-dashboard', '/team', '/targets', '/compensation', 
+                       '/accounts', '/products', '/reports', '/profile', '/settings', '/comparison', 
+                       '/employee', '/data-input'],
+    [UserRole.TSM]: ['/dashboard', '/team', '/targets', '/compensation', '/accounts', 
+                    '/products', '/reports', '/profile', '/data-input'],
+    [UserRole.ASE]: ['/dashboard', '/team', '/targets', '/compensation', '/products', 
+                    '/reports', '/profile', '/data-input'],
+    [UserRole.ASM]: ['/dashboard', '/team', '/targets', '/compensation', '/products', 
+                    '/reports', '/profile', '/data-input'],
+    [UserRole.SR]: ['/data-input', '/profile', '/products', '/targets', '/compensation'],
+    [UserRole.KAM]: ['/dashboard', '/accounts', '/targets', '/compensation', '/products', 
+                    '/reports', '/profile', '/data-input']
+  };
+
+  // Check if user has access to current path
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const userAllowedPaths = roleBasedPaths[user.role] || [];
+      const currentPathBase = '/' + location.pathname.split('/')[1]; // Get base path
+
+      if (!userAllowedPaths.some(path => currentPathBase.startsWith(path)) && 
+          currentPathBase !== '/') {
+        // Redirect to appropriate default page based on role
+        if (user.role === UserRole.SR) {
+          navigate('/data-input');
+        } else {
+          navigate('/dashboard');
+        }
+      }
+    }
+  }, [isAuthenticated, user, location.pathname, navigate]);
 
   if (isLoading) {
     return (
@@ -19,18 +55,6 @@ const Layout: React.FC = () => {
 
   if (!isAuthenticated) {
     return <LoginPage />;
-  }
-
-  // Redirect employees to the data input page when they first log in
-  if (user?.role === UserRole.DSR || user?.role === UserRole.RSO) {
-    // We'll check if the user is trying to access a restricted page and redirect if needed
-    const path = window.location.pathname;
-    const employeeAllowedPaths = ['/data-input', '/profile', '/products'];
-    const isAllowedPath = employeeAllowedPaths.some(allowedPath => path.startsWith(allowedPath));
-    
-    if (!isAllowedPath && path !== '/') {
-      return <Navigate to="/data-input" replace />;
-    }
   }
 
   return (
