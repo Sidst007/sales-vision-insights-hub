@@ -9,7 +9,7 @@ const Index = () => {
     <div
      className="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
      style={{
-       backgroundImage: `url("C:\Users\sidsp\Desktop\MHC\SalesVisionBackdrop.png")`, // path to your wave image
+       backgroundImage: `url(C:\Users\sidsp\Desktop\MHC\sales-vision-insights-hub\public\asset\SalesVisionBackdrop.png")`, // path to your wave image
      }}
    >
      <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-10 text-center max-w-md">
