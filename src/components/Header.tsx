@@ -5,7 +5,8 @@ import {
   HelpCircle, 
   Download, 
   FileText,
-  ChevronDown
+  ChevronDown,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -19,19 +20,23 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
-interface HeaderProps {
+export interface HeaderProps {
   title: string;
   subtitle?: string;
   showExport?: boolean;
+  showBackButton?: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({ 
   title, 
   subtitle, 
-  showExport = false 
+  showExport = false,
+  showBackButton = false
 }) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   
   const handleExport = (format: 'pdf' | 'excel') => {
     toast.success(`Exporting as ${format.toUpperCase()} file...`);
@@ -49,9 +54,21 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <header className="border-b bg-white sticky top-0 z-10">
       <div className="container flex flex-col sm:flex-row justify-between items-start sm:items-center py-4">
-        <div>
-          <h1 className="text-2xl font-bold">{title}</h1>
-          {subtitle && <p className="text-muted-foreground text-sm">{subtitle}</p>}
+        <div className="flex items-center">
+          {showBackButton && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="mr-2" 
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft size={20} />
+            </Button>
+          )}
+          <div>
+            <h1 className="text-2xl font-bold">{title}</h1>
+            {subtitle && <p className="text-muted-foreground text-sm">{subtitle}</p>}
+          </div>
         </div>
         
         <div className="flex items-center space-x-4 mt-4 sm:mt-0">
