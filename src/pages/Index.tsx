@@ -6,24 +6,13 @@ import backgroundImage from './backdrop.png'
 
 const Index = () => {
   return (
-//   <div
-//      className="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
-//      style={{
-//        backgroundImage: `url('https://ibb.co/ycM51VxW')`, // path to your wave image
-//      }}
-//    >
+
     <div
-  className="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
-  style={{
-    backgroundImage: `url('https://i.ibb.co/bMyLZ7G/backdrop.png')`,
-  }}
->
-//    <div
-  //    className="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
-    //  style={{
-      //  backgroundImage: `url(${backgroundImage})`,
-  //    }}
-  //  >
+      className="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+      }}
+    >
 
 
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-10 text-center max-w-md">
