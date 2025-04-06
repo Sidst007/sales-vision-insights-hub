@@ -13,18 +13,18 @@ const Layout: React.FC = () => {
 
   // Define role-based access paths
   const roleBasedPaths = {
-    [UserRole.ADMIN]: ['/dashboard', '/owner-dashboard', '/team', '/targets', '/compensation', 
+    [UserRole.ADMIN]: ['/dashboard', '/owner-dashboard', '/team', '/team-hierarchy', '/targets', '/compensation', 
                        '/accounts', '/products', '/reports', '/profile', '/settings', '/comparison', 
-                       '/employee', '/data-input'],
-    [UserRole.TSM]: ['/dashboard', '/team', '/targets', '/compensation', '/accounts', 
-                    '/products', '/reports', '/profile', '/data-input'],
-    [UserRole.ASE]: ['/dashboard', '/team', '/targets', '/compensation', '/products', 
-                    '/reports', '/profile', '/data-input'],
+                       '/employee', '/data-input', '/employee-management', '/profile'],
+    [UserRole.TSM]: ['/dashboard', '/team', '/team-hierarchy', '/targets', '/compensation', '/accounts', 
+                    '/products', '/reports', '/profile', '/data-input', '/employee', '/profile'],
+    [UserRole.ASE]: ['/dashboard', '/team', '/team-hierarchy', '/targets', '/compensation', '/products', 
+                    '/reports', '/profile', '/data-input', '/employee', '/profile'],
     [UserRole.ASM]: ['/dashboard', '/team', '/targets', '/compensation', '/products', 
-                    '/reports', '/profile', '/data-input'],
-    [UserRole.SR]: ['/data-input', '/profile', '/products', '/targets', '/compensation'],
+                    '/reports', '/profile', '/data-input', '/profile'],
+    [UserRole.SR]: ['/data-input', '/profile', '/products', '/targets', '/compensation', '/profile'],
     [UserRole.KAM]: ['/dashboard', '/accounts', '/targets', '/compensation', '/products', 
-                    '/reports', '/profile', '/data-input']
+                    '/reports', '/profile', '/data-input', '/profile']
   };
 
   // Check if user has access to current path

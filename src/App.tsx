@@ -15,6 +15,9 @@ import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
 import EmployeeDetailPage from "./pages/EmployeeDetailPage";
 import ComparisonPage from "./pages/ComparisonPage";
+import EmployeeManagementPage from "./pages/EmployeeManagementPage";
+import TeamHierarchyPage from "./pages/TeamHierarchyPage";
+import ProfileDetailPage from "./pages/ProfileDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -30,11 +33,14 @@ const App = () => (
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/team" element={<TeamPage />} />
+              <Route path="/team-hierarchy" element={<TeamHierarchyPage />} />
               <Route path="/data-input" element={<DataInputPage />} />
               <Route path="/owner-dashboard" element={<OwnerDashboardPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/employee/:employeeId" element={<EmployeeDetailPage />} />
+              <Route path="/profile/:employeeId" element={<ProfileDetailPage />} />
               <Route path="/comparison" element={<ComparisonPage />} />
+              <Route path="/employee-management" element={<EmployeeManagementPage />} />
               {/* Placeholder routes for future implementation */}
               <Route path="/analytics" element={<DashboardPage />} />
               <Route path="/targets" element={<DashboardPage />} />

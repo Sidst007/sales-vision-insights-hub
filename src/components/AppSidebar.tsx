@@ -12,7 +12,8 @@ import {
   Settings, 
   Home,
   FileInput,
-  User
+  User,
+  UserCog
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -27,6 +28,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 // Navigation item interface
 interface NavItem {
@@ -61,6 +63,18 @@ const navItems: NavItem[] = [
     path: '/team',
     icon: Users,
     roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE, UserRole.ASM]
+  },
+  {
+    title: 'Team Hierarchy',
+    path: '/team-hierarchy',
+    icon: Users,
+    roles: [UserRole.ADMIN, UserRole.TSM, UserRole.ASE]
+  },
+  {
+    title: 'Employee Management',
+    path: '/employee-management',
+    icon: UserCog,
+    roles: [UserRole.ADMIN]
   },
   {
     title: 'Sales Targets',
@@ -127,6 +141,21 @@ const AppSidebar = () => {
         <div className="flex justify-between items-center px-4 mb-4 md:hidden">
           <SidebarTrigger />
         </div>
+        
+        {user && (
+          <div className="px-4 mb-6">
+            <div className="flex items-center space-x-3 p-2 rounded-lg bg-sidebar-accent/20">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-white truncate">{user.name}</p>
+                <p className="text-xs text-white/70 truncate">{user.role}</p>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div className="px-3">
           <SidebarMenu>
