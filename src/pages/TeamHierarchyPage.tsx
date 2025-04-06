@@ -1,40 +1,29 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
-import { OrganizationChart } from '@/components/OrganizationChart';
 import { Card, CardContent } from '@/components/ui/card';
 import { UserRole } from '@/contexts/AuthContext';
+import { OrganizationChart } from '@/components/OrganizationChart';
 
-// Update the interface to match User structure required by OrganizationChart
 interface EmployeeNode {
   id: string;
   name: string;
   role: UserRole;
   avatar: string;
-  email: string; // Make email required
+  email: string;
   managerId?: string;
-  region?: string;
-  territory?: string;
-  phone?: string;
-  address?: string;
-  joined?: string;
-  target?: number;
-  performance?: number;
-  manager?: string;
 }
 
 const TeamHierarchyPage: React.FC = () => {
   const { user } = useAuth();
-  
-  // Hardcoded data with required email property for each employee
+
   const employees: EmployeeNode[] = [
     {
       id: "admin1",
       name: "Meera Joshi",
       role: UserRole.ADMIN,
       avatar: "https://i.pravatar.cc/300?img=8",
-      email: "admin@example.com",
+      email: "meera.joshi@salesvision.com",
     },
     {
       id: "tsm1",
@@ -42,7 +31,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.TSM,
       avatar: "https://i.pravatar.cc/300?img=11",
       managerId: "admin1",
-      email: "tsm1@example.com",
+      email: "rajesh.kumar@salesvision.com",
     },
     {
       id: "tsm2",
@@ -50,7 +39,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.TSM,
       avatar: "https://i.pravatar.cc/300?img=1",
       managerId: "admin1",
-      email: "tsm2@example.com",
+      email: "anita.desai@salesvision.com",
     },
     {
       id: "ase1",
@@ -58,7 +47,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASE,
       avatar: "https://i.pravatar.cc/300?img=5",
       managerId: "tsm1",
-      email: "ase1@example.com",
+      email: "priya.sharma@salesvision.com",
     },
     {
       id: "ase2",
@@ -66,7 +55,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASE,
       avatar: "https://i.pravatar.cc/300?img=12",
       managerId: "tsm1",
-      email: "ase2@example.com",
+      email: "amit.patel@salesvision.com",
     },
     {
       id: "ase3",
@@ -74,7 +63,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASE,
       avatar: "https://i.pravatar.cc/300?img=2",
       managerId: "tsm1",
-      email: "ase3@example.com",
+      email: "neha.gupta@salesvision.com",
     },
     {
       id: "ase4",
@@ -82,7 +71,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASE,
       avatar: "https://i.pravatar.cc/300?img=13",
       managerId: "tsm2",
-      email: "ase4@example.com",
+      email: "vikram.malhotra@salesvision.com",
     },
     {
       id: "ase5",
@@ -90,7 +79,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASE,
       avatar: "https://i.pravatar.cc/300?img=3",
       managerId: "tsm2",
-      email: "ase5@example.com",
+      email: "kavita.reddy@salesvision.com",
     },
     {
       id: "ase6",
@@ -98,7 +87,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASE,
       avatar: "https://i.pravatar.cc/300?img=14",
       managerId: "tsm2",
-      email: "ase6@example.com",
+      email: "deepak.nair@salesvision.com",
     },
     {
       id: "asm1",
@@ -106,7 +95,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASM,
       avatar: "https://i.pravatar.cc/300?img=15",
       managerId: "ase1",
-      email: "asm1@example.com",
+      email: "ravi.verma@salesvision.com",
     },
     {
       id: "asm2",
@@ -114,7 +103,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASM,
       avatar: "https://i.pravatar.cc/300?img=4",
       managerId: "ase1",
-      email: "asm2@example.com",
+      email: "sunita.singh@salesvision.com",
     },
     {
       id: "asm3",
@@ -122,7 +111,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASM,
       avatar: "https://i.pravatar.cc/300?img=16",
       managerId: "ase2",
-      email: "asm3@example.com",
+      email: "prakash.mehta@salesvision.com",
     },
     {
       id: "asm4",
@@ -130,7 +119,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASM,
       avatar: "https://i.pravatar.cc/300?img=5",
       managerId: "ase2",
-      email: "asm4@example.com",
+      email: "meena.khanna@salesvision.com",
     },
     {
       id: "asm5",
@@ -138,7 +127,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.ASM,
       avatar: "https://i.pravatar.cc/300?img=17",
       managerId: "ase3",
-      email: "asm5@example.com",
+      email: "ajay.mathur@salesvision.com",
     },
     {
       id: "sr1",
@@ -146,7 +135,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.SR,
       avatar: "https://i.pravatar.cc/300?img=18",
       managerId: "asm1",
-      email: "sr1@example.com",
+      email: "rahul.saxena@salesvision.com",
     },
     {
       id: "sr2",
@@ -154,7 +143,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.SR,
       avatar: "https://i.pravatar.cc/300?img=6",
       managerId: "asm1",
-      email: "sr2@example.com",
+      email: "pooja.agarwal@salesvision.com",
     },
     {
       id: "sr3",
@@ -162,7 +151,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.SR,
       avatar: "https://i.pravatar.cc/300?img=19",
       managerId: "asm2",
-      email: "sr3@example.com",
+      email: "vivek.chauhan@salesvision.com",
     },
     {
       id: "sr4",
@@ -170,7 +159,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.SR,
       avatar: "https://i.pravatar.cc/300?img=7",
       managerId: "asm2",
-      email: "sr4@example.com",
+      email: "divya.sharma@salesvision.com",
     },
     {
       id: "sr5",
@@ -178,7 +167,7 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.SR,
       avatar: "https://i.pravatar.cc/300?img=20",
       managerId: "asm3",
-      email: "sr5@example.com",
+      email: "suresh.kapoor@salesvision.com",
     },
     {
       id: "kam1",
@@ -186,10 +175,10 @@ const TeamHierarchyPage: React.FC = () => {
       role: UserRole.KAM,
       avatar: "https://i.pravatar.cc/300?img=9",
       managerId: "admin1",
-      email: "kam@example.com",
+      email: "sunita.reddy@salesvision.com",
     }
   ];
-  
+
   return (
     <div className="pb-8">
       <Header
@@ -197,7 +186,7 @@ const TeamHierarchyPage: React.FC = () => {
         subtitle="View your organizational structure"
         showExport
       />
-      
+
       <div className="container mt-6">
         <Card>
           <CardContent className="p-6 overflow-x-auto">
