@@ -2,15 +2,24 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import backgroundImage from './backdrop.png'
 
 const Index = () => {
   return (
+//   <div
+//      className="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
+//      style={{
+//        backgroundImage: `url('/assets/backdrop.png')`, // path to your wave image
+//      }}
+//    >
     <div
       className="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
       style={{
-        backgroundImage: `url('/assets/SalesVisionBackdrop.png')`, // path to your wave image
+        backgroundImage: `url(${backgroundImage})`,
       }}
     >
+
+
       <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-10 text-center max-w-md">
         <h1 className="text-4xl font-bold text-sales-primary mb-2">SalesVision</h1>
         <p className="text-xl text-sales-dark mb-6">Insights Hub for FMCG Sales Teams</p>
