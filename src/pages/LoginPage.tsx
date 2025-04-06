@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { ChevronRight } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -26,13 +27,42 @@ const LoginPage: React.FC = () => {
   };
 
   const demoUsers = [
-    { role: 'Territory Sales Manager', email: 'tsm@example.com' },
-    { role: 'Area Sales Executive', email: 'ase@example.com' },
-    { role: 'Distributor Sales Representative', email: 'dsr@example.com' },
-    { role: 'Key Account Manager', email: 'kam@example.com' },
-    { role: 'Retail Sales Officer', email: 'rso@example.com' },
-    { role: 'Administrator', email: 'admin@example.com' }
+    { 
+      role: UserRole.ADMIN, 
+      email: 'admin@example.com',
+      description: 'Full access to all features and dashboards'
+    },
+    { 
+      role: UserRole.TSM, 
+      email: 'tsm1@example.com',
+      description: 'Manage territory sales teams and targets'
+    },
+    { 
+      role: UserRole.ASE, 
+      email: 'ase1@example.com',
+      description: 'Handle area-level sales operations'
+    },
+    { 
+      role: UserRole.ASM, 
+      email: 'asm1@example.com',
+      description: 'Manage sales teams within specific areas'
+    },
+    { 
+      role: UserRole.SR, 
+      email: 'sr1@example.com',
+      description: 'Track individual sales performance and tasks'
+    },
+    { 
+      role: UserRole.KAM, 
+      email: 'kam@example.com',
+      description: 'Manage key client accounts and relationships'
+    }
   ];
+
+  const setDemoCredentials = (demoEmail: string) => {
+    setEmail(demoEmail);
+    setPassword('password');
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-sales-lightest to-white p-4">
@@ -91,28 +121,67 @@ const LoginPage: React.FC = () => {
               )}
               
               {showHints && (
-                <div className="bg-sales-light rounded-md p-3 text-sm">
-                  <p className="font-medium mb-1">Demo Information:</p>
-                  <p className="text-xs mb-2">Use any of the following email addresses with password: <code className="bg-white px-1 py-0.5 rounded">password</code></p>
-                  <ul className="space-y-1">
-                    {demoUsers.map((user, index) => (
-                      <li key={index} className="text-xs flex justify-between">
-                        <span>{user.role}:</span>
+                <div className="bg-sales-light rounded-md p-4 text-sm">
+                  <Tabs defaultValue="admin">
+                    <TabsList className="grid grid-cols-3 mb-4">
+                      <TabsTrigger value="admin">Admin</TabsTrigger>
+                      <TabsTrigger value="managers">Managers</TabsTrigger>
+                      <TabsTrigger value="reps">Sales Reps</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="admin" className="space-y-2">
+                      <div className="flex justify-between items-center p-2 bg-white/50 rounded hover:bg-white">
+                        <div>
+                          <p className="font-medium">{demoUsers[0].role}</p>
+                          <p className="text-xs text-muted-foreground">{demoUsers[0].description}</p>
+                        </div>
                         <Button 
-                          variant="link" 
                           size="sm" 
-                          className="h-auto p-0 text-sales-primary" 
-                          type="button"
-                          onClick={() => {
-                            setEmail(user.email);
-                            setPassword('password');
-                          }}
+                          onClick={() => setDemoCredentials(demoUsers[0].email)}
                         >
-                          {user.email}
+                          Use
                         </Button>
-                      </li>
-                    ))}
-                  </ul>
+                      </div>
+                    </TabsContent>
+                    
+                    <TabsContent value="managers" className="space-y-2">
+                      {demoUsers.slice(1, 4).map((user, index) => (
+                        <div key={index} className="flex justify-between items-center p-2 bg-white/50 rounded hover:bg-white">
+                          <div>
+                            <p className="font-medium">{user.role}</p>
+                            <p className="text-xs text-muted-foreground">{user.description}</p>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            onClick={() => setDemoCredentials(user.email)}
+                          >
+                            Use
+                          </Button>
+                        </div>
+                      ))}
+                    </TabsContent>
+                    
+                    <TabsContent value="reps" className="space-y-2">
+                      {demoUsers.slice(4).map((user, index) => (
+                        <div key={index} className="flex justify-between items-center p-2 bg-white/50 rounded hover:bg-white">
+                          <div>
+                            <p className="font-medium">{user.role}</p>
+                            <p className="text-xs text-muted-foreground">{user.description}</p>
+                          </div>
+                          <Button 
+                            size="sm" 
+                            onClick={() => setDemoCredentials(user.email)}
+                          >
+                            Use
+                          </Button>
+                        </div>
+                      ))}
+                    </TabsContent>
+                  </Tabs>
+                  
+                  <p className="text-xs mt-2 text-center">
+                    All demo accounts use password: <code className="bg-white px-1 py-0.5 rounded">password</code>
+                  </p>
                 </div>
               )}
             </CardContent>
