@@ -1,27 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Filter, 
-  Plus, 
-  Trash2, 
-  Edit, 
-  UserPlus,
-  ChevronDown 
-} from 'lucide-react';
-import { useAuth, User, UserRole } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Search, Plus, Edit, Trash2, ArrowUpDown, Filter } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
@@ -29,24 +15,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '@/components/ui/avatar';
-import {
-  Card
-} from '@/components/ui/card';
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
   Select,
@@ -55,460 +31,771 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import { formatPercentage, getPerformanceColor } from '@/utils/data-utils';
+import { UserRole } from '@/contexts/AuthContext';
+
+// Sample employee data
+const SAMPLE_EMPLOYEES = [
+  {
+    id: "admin1",
+    name: "Meera Joshi",
+    email: "admin@example.com",
+    role: UserRole.ADMIN,
+    avatar: "https://i.pravatar.cc/300?img=8",
+    region: "All",
+    territory: "All",
+    status: "active"
+  },
+  {
+    id: "tsm1",
+    name: "Rajesh Kumar",
+    email: "tsm1@example.com",
+    role: UserRole.TSM,
+    avatar: "https://i.pravatar.cc/300?img=11",
+    region: "North",
+    territory: "Delhi-NCR",
+    status: "active"
+  },
+  {
+    id: "tsm2",
+    name: "Anita Desai",
+    email: "tsm2@example.com",
+    role: UserRole.TSM,
+    avatar: "https://i.pravatar.cc/300?img=1",
+    region: "South",
+    territory: "Bangalore",
+    status: "active"
+  },
+  {
+    id: "ase1",
+    name: "Priya Sharma",
+    email: "ase1@example.com",
+    role: UserRole.ASE,
+    avatar: "https://i.pravatar.cc/300?img=5",
+    region: "North",
+    territory: "Delhi",
+    status: "active"
+  },
+  {
+    id: "ase2",
+    name: "Amit Patel",
+    email: "ase2@example.com",
+    role: UserRole.ASE,
+    avatar: "https://i.pravatar.cc/300?img=12",
+    region: "North",
+    territory: "Gurgaon",
+    status: "active"
+  },
+  {
+    id: "sr1",
+    name: "Rahul Saxena",
+    email: "sr1@example.com",
+    role: UserRole.SR,
+    avatar: "https://i.pravatar.cc/300?img=18",
+    region: "North",
+    territory: "Delhi Central Zone 1",
+    status: "inactive"
+  },
+];
+
+// Employee interface
+interface Employee {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
+  region?: string;
+  territory?: string;
+  status: 'active' | 'inactive' | 'pending';
+}
 
 const EmployeeManagementPage: React.FC = () => {
-  const { user, users, updateUserProfile } = useAuth();
   const navigate = useNavigate();
+  const [employees, setEmployees] = useState<Employee[]>(SAMPLE_EMPLOYEES);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [currentTab, setCurrentTab] = useState('all');
+  const [sortField, setSortField] = useState<keyof Employee>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [filterRole, setFilterRole] = useState<UserRole | 'all'>('all');
+  const [filterRegion, setFilterRegion] = useState<string | 'all'>('all');
   
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState<string | null>(null);
-  const [selectedEmployees, setSelectedEmployees] = useState<string[]>([]);
-  const [filteredEmployees, setFilteredEmployees] = useState<User[]>([]);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showAddDialog, setShowAddDialog] = useState(false);
-  const [newEmployee, setNewEmployee] = useState({
+  // Form state for add/edit
+  const [formState, setFormState] = useState<Partial<Employee>>({
     name: '',
     email: '',
     role: UserRole.SR,
-    managerId: '',
+    region: '',
+    territory: '',
+    status: 'active',
   });
   
-  // Only admin can access this page
-  useEffect(() => {
-    if (user && user.role !== UserRole.ADMIN) {
-      navigate('/dashboard');
-    }
-  }, [user, navigate]);
-  
-  // Filter and search employees
-  useEffect(() => {
-    let result = [...users];
-    
-    // Apply search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(emp => 
-        emp.name.toLowerCase().includes(term) || 
-        emp.email.toLowerCase().includes(term) ||
-        emp.role.toLowerCase().includes(term)
-      );
-    }
-    
-    // Apply role filter
-    if (filterRole) {
-      result = result.filter(emp => emp.role === filterRole);
-    }
-    
-    setFilteredEmployees(result);
-  }, [users, searchTerm, filterRole]);
-  
-  // Group employees by role for quick stats
-  const tsms = users.filter(u => u.role === UserRole.TSM);
-  const ases = users.filter(u => u.role === UserRole.ASE);
-  const asms = users.filter(u => u.role === UserRole.ASM);
-  
-  // Handle selection of employees
-  const toggleSelectEmployee = (employeeId: string) => {
-    setSelectedEmployees(prev => 
-      prev.includes(employeeId)
-        ? prev.filter(id => id !== employeeId)
-        : [...prev, employeeId]
-    );
+  // Handle search functionality
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
   
-  // Select all visible employees
-  const toggleSelectAll = () => {
-    if (selectedEmployees.length === filteredEmployees.length) {
-      setSelectedEmployees([]);
+  // Filter employees based on search, role, region, and status
+  const filteredEmployees = employees.filter(employee => {
+    const matchesSearch = employee.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        employee.email.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesStatus = currentTab === 'all' || 
+                         (currentTab === 'active' && employee.status === 'active') ||
+                         (currentTab === 'inactive' && employee.status === 'inactive') ||
+                         (currentTab === 'pending' && employee.status === 'pending');
+    
+    const matchesRole = filterRole === 'all' || employee.role === filterRole;
+    
+    const matchesRegion = filterRegion === 'all' || employee.region === filterRegion;
+    
+    return matchesSearch && matchesStatus && matchesRole && matchesRegion;
+  });
+  
+  // Sort employees
+  const sortedEmployees = [...filteredEmployees].sort((a, b) => {
+    if (a[sortField] && b[sortField]) {
+      const valueA = a[sortField].toString().toLowerCase();
+      const valueB = b[sortField].toString().toLowerCase();
+      
+      if (sortDirection === 'asc') {
+        return valueA.localeCompare(valueB);
+      } else {
+        return valueB.localeCompare(valueA);
+      }
+    }
+    return 0;
+  });
+  
+  // Handle sort change
+  const handleSort = (field: keyof Employee) => {
+    if (field === sortField) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      setSelectedEmployees(filteredEmployees.map(emp => emp.id));
+      setSortField(field);
+      setSortDirection('asc');
     }
   };
   
-  // Handle bulk delete
-  const handleDelete = () => {
-    // In a real app, this would call an API to delete the employees
-    toast.success(`${selectedEmployees.length} employees deleted successfully`);
-    setSelectedEmployees([]);
-    setShowDeleteDialog(false);
-  };
-  
-  // Handle adding a new employee
-  const handleAddEmployee = () => {
-    // In a real app, this would call an API to add the employee
-    if (!newEmployee.name || !newEmployee.email) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-    
-    // Check if email is already in use
-    if (users.some(u => u.email === newEmployee.email)) {
-      toast.error("Email is already in use");
-      return;
-    }
-    
-    toast.success(`${newEmployee.name} added successfully as ${newEmployee.role}`);
-    setNewEmployee({
+  // Reset form state
+  const resetForm = () => {
+    setFormState({
       name: '',
       email: '',
       role: UserRole.SR,
-      managerId: '',
+      region: '',
+      territory: '',
+      status: 'active',
     });
-    setShowAddDialog(false);
   };
   
-  // Get manager options based on role selection
-  const getManagerOptions = () => {
-    switch (newEmployee.role) {
-      case UserRole.ASE:
-      case UserRole.ASM:
-        return users.filter(u => u.role === UserRole.TSM);
-      case UserRole.SR:
-        return users.filter(u => u.role === UserRole.ASM);
-      default:
-        return [];
+  // Open add dialog
+  const openAddDialog = () => {
+    resetForm();
+    setIsAddDialogOpen(true);
+  };
+  
+  // Open edit dialog
+  const openEditDialog = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setFormState({
+      name: employee.name,
+      email: employee.email,
+      role: employee.role,
+      region: employee.region,
+      territory: employee.territory,
+      status: employee.status,
+    });
+    setIsEditDialogOpen(true);
+  };
+  
+  // Open delete dialog
+  const openDeleteDialog = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  // Handle form input change
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormState(prev => ({ ...prev, [name]: value }));
+  };
+  
+  // Handle select input change
+  const handleSelectChange = (name: string, value: string) => {
+    setFormState(prev => ({ ...prev, [name]: value }));
+  };
+  
+  // Add new employee
+  const handleAddEmployee = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formState.name || !formState.email || !formState.role) {
+      toast.error('Please fill in all required fields');
+      return;
     }
+    
+    const newEmployee: Employee = {
+      id: `emp-${Date.now()}`,
+      name: formState.name || '',
+      email: formState.email || '',
+      role: formState.role as UserRole,
+      region: formState.region,
+      territory: formState.territory,
+      status: formState.status as 'active' | 'inactive' | 'pending',
+      avatar: `https://i.pravatar.cc/300?img=${Math.floor(Math.random() * 70)}`,
+    };
+    
+    setEmployees([...employees, newEmployee]);
+    setIsAddDialogOpen(false);
+    toast.success('Employee added successfully');
+    resetForm();
   };
   
-  // Function to get employee's manager name
-  const getManagerName = (managerId: string) => {
-    const manager = users.find(u => u.id === managerId);
-    return manager ? manager.name : 'None';
+  // Update existing employee
+  const handleUpdateEmployee = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedEmployee) return;
+    
+    if (!formState.name || !formState.email || !formState.role) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    
+    const updatedEmployees = employees.map(emp => 
+      emp.id === selectedEmployee.id
+        ? {
+            ...emp,
+            name: formState.name || emp.name,
+            email: formState.email || emp.email,
+            role: formState.role as UserRole || emp.role,
+            region: formState.region,
+            territory: formState.territory,
+            status: formState.status as 'active' | 'inactive' | 'pending' || emp.status,
+          }
+        : emp
+    );
+    
+    setEmployees(updatedEmployees);
+    setIsEditDialogOpen(false);
+    toast.success('Employee updated successfully');
+    resetForm();
   };
+  
+  // Delete employee
+  const handleDeleteEmployee = () => {
+    if (!selectedEmployee) return;
+    
+    const updatedEmployees = employees.filter(emp => emp.id !== selectedEmployee.id);
+    setEmployees(updatedEmployees);
+    setIsDeleteDialogOpen(false);
+    toast.success('Employee deleted successfully');
+  };
+  
+  // Get unique regions for filtering
+  const uniqueRegions = Array.from(new Set(employees.map(emp => emp.region).filter(Boolean)));
   
   return (
     <div className="pb-8">
-      <Header 
-        title="Employee Management" 
-        subtitle="Manage your team members and their roles" 
-        showExport={true}
+      <Header
+        title="Employee Management"
+        subtitle="Manage your team members"
       />
       
-      <div className="dashboard-layout">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="p-4 flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-full bg-sales-light flex items-center justify-center">
-              <UserPlus className="h-6 w-6 text-sales-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Employees</p>
-              <p className="text-2xl font-bold">{users.length}</p>
-            </div>
-          </Card>
-          
-          <Card className="p-4 flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-              <UserPlus className="h-6 w-6 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Territory Managers</p>
-              <p className="text-2xl font-bold">{tsms.length}</p>
-            </div>
-          </Card>
-          
-          <Card className="p-4 flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-              <UserPlus className="h-6 w-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Area Executives</p>
-              <p className="text-2xl font-bold">{ases.length}</p>
-            </div>
-          </Card>
-          
-          <Card className="p-4 flex items-center space-x-4">
-            <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-              <UserPlus className="h-6 w-6 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Area Managers</p>
-              <p className="text-2xl font-bold">{asms.length}</p>
-            </div>
-          </Card>
-        </div>
-        
-        {/* Search and Filter Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-auto">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search employees..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full sm:w-[300px]"
-            />
-          </div>
-          
-          <div className="flex flex-wrap gap-2 w-full sm:w-auto justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="flex gap-2">
-                  <Filter className="h-4 w-4" />
-                  Filter
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>Filter by Role</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                  checked={filterRole === null}
-                  onCheckedChange={() => setFilterRole(null)}
-                >
-                  All Roles
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={filterRole === UserRole.ADMIN}
-                  onCheckedChange={() => setFilterRole(UserRole.ADMIN)}
-                >
-                  Administrator
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={filterRole === UserRole.TSM}
-                  onCheckedChange={() => setFilterRole(UserRole.TSM)}
-                >
-                  Territory Sales Manager
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={filterRole === UserRole.ASE}
-                  onCheckedChange={() => setFilterRole(UserRole.ASE)}
-                >
-                  Area Sales Executive
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={filterRole === UserRole.ASM}
-                  onCheckedChange={() => setFilterRole(UserRole.ASM)}
-                >
-                  Area Sales Manager
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={filterRole === UserRole.SR}
-                  onCheckedChange={() => setFilterRole(UserRole.SR)}
-                >
-                  Sales Representative
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={filterRole === UserRole.KAM}
-                  onCheckedChange={() => setFilterRole(UserRole.KAM)}
-                >
-                  Key Account Manager
-                </DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-              <DialogTrigger asChild>
-                <Button className="bg-sales-primary hover:bg-sales-dark flex gap-2">
-                  <Plus className="h-4 w-4" />
-                  Add Employee
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Add New Employee</DialogTitle>
-                  <DialogDescription>
-                    Create a new employee profile. All fields are required.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Name
-                    </Label>
-                    <Input
-                      id="name"
-                      value={newEmployee.name}
-                      onChange={(e) => setNewEmployee({...newEmployee, name: e.target.value})}
-                      className="col-span-3"
-                      placeholder="John Doe"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="email" className="text-right">
-                      Email
-                    </Label>
-                    <Input
-                      id="email"
-                      value={newEmployee.email}
-                      onChange={(e) => setNewEmployee({...newEmployee, email: e.target.value})}
-                      className="col-span-3"
-                      placeholder="john.doe@example.com"
-                      type="email"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="role" className="text-right">
-                      Role
-                    </Label>
-                    <Select 
-                      value={newEmployee.role}
-                      onValueChange={(value) => setNewEmployee({...newEmployee, role: value as UserRole})}
-                    >
-                      <SelectTrigger className="col-span-3">
-                        <SelectValue placeholder="Select a role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={UserRole.TSM}>Territory Sales Manager</SelectItem>
-                        <SelectItem value={UserRole.ASE}>Area Sales Executive</SelectItem>
-                        <SelectItem value={UserRole.ASM}>Area Sales Manager</SelectItem>
-                        <SelectItem value={UserRole.SR}>Sales Representative</SelectItem>
-                        <SelectItem value={UserRole.KAM}>Key Account Manager</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {(newEmployee.role === UserRole.ASE || 
-                    newEmployee.role === UserRole.ASM || 
-                    newEmployee.role === UserRole.SR) && (
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="manager" className="text-right">
-                        Manager
-                      </Label>
-                      <Select 
-                        value={newEmployee.managerId}
-                        onValueChange={(value) => setNewEmployee({...newEmployee, managerId: value})}
-                      >
-                        <SelectTrigger className="col-span-3">
-                          <SelectValue placeholder="Select a manager" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {getManagerOptions().map((manager) => (
-                            <SelectItem key={manager.id} value={manager.id}>
-                              {manager.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </div>
-                <DialogFooter>
-                  <Button onClick={() => setShowAddDialog(false)} variant="outline">
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddEmployee} className="bg-sales-primary hover:bg-sales-dark">
-                    Add Employee
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            
-            {selectedEmployees.length > 0 && (
-              <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                <DialogTrigger asChild>
-                  <Button variant="destructive" className="flex gap-2">
-                    <Trash2 className="h-4 w-4" />
-                    Delete Selected
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Confirm Deletion</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to delete {selectedEmployees.length} selected employee(s)? 
-                      This action cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter className="gap-2 sm:gap-0">
-                    <Button onClick={() => setShowDeleteDialog(false)} variant="outline">
-                      Cancel
-                    </Button>
-                    <Button onClick={handleDelete} variant="destructive">
-                      Delete
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            )}
-          </div>
-        </div>
-        
-        {/* Employee Table */}
+      <div className="container mt-6">
         <Card>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-12">
-                    <input 
-                      type="checkbox" 
-                      className="h-4 w-4 rounded border-gray-300 text-sales-primary"
-                      checked={selectedEmployees.length === filteredEmployees.length && filteredEmployees.length > 0}
-                      onChange={toggleSelectAll}
-                    />
-                  </TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Manager</TableHead>
-                  <TableHead>Performance</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredEmployees.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={7} className="h-32 text-center">
-                      No employees found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredEmployees.map((employee) => (
-                    <TableRow key={employee.id}>
-                      <TableCell>
-                        <input 
-                          type="checkbox" 
-                          className="h-4 w-4 rounded border-gray-300 text-sales-primary"
-                          checked={selectedEmployees.includes(employee.id)}
-                          onChange={() => toggleSelectEmployee(employee.id)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={employee.avatar} alt={employee.name} />
-                            <AvatarFallback>{employee.name.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div className="font-medium">{employee.name}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{employee.email}</TableCell>
-                      <TableCell>{employee.role}</TableCell>
-                      <TableCell>{employee.managerId ? getManagerName(employee.managerId) : 'None'}</TableCell>
-                      <TableCell>
-                        <div className={`text-sm font-medium ${getPerformanceColor(employee.performance || 0, 100, true)}`}>
-                          {formatPercentage(employee.performance || 0)}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            onClick={() => navigate(`/profile/${employee.id}`)}
+          <CardHeader className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 pb-2">
+            <CardTitle>Employees</CardTitle>
+            <Button onClick={openAddDialog} className="bg-sales-primary">
+              <Plus size={16} className="mr-1" /> Add Employee
+            </Button>
+          </CardHeader>
+          
+          <CardContent>
+            <div className="mb-6">
+              <Tabs value={currentTab} onValueChange={setCurrentTab}>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-4 sm:space-y-0">
+                  <TabsList>
+                    <TabsTrigger value="all">All Employees</TabsTrigger>
+                    <TabsTrigger value="active">Active</TabsTrigger>
+                    <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                    <TabsTrigger value="pending">Pending</TabsTrigger>
+                  </TabsList>
+                  
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        placeholder="Search employees..."
+                        className="pl-8 w-full sm:w-[250px]"
+                        value={searchQuery}
+                        onChange={handleSearch}
+                      />
+                    </div>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <Filter size={14} className="mr-1" /> Filter
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[200px]">
+                        <DropdownMenuLabel>Filter Options</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        
+                        <div className="p-2">
+                          <Label htmlFor="role-filter" className="text-xs">Role</Label>
+                          <Select 
+                            value={filterRole.toString()} 
+                            onValueChange={(value) => setFilterRole(value as UserRole | 'all')}
                           >
-                            <Edit className="h-4 w-4 text-muted-foreground" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon"
-                            onClick={() => toggleSelectEmployee(employee.id)}
-                          >
-                            <Trash2 className="h-4 w-4 text-sales-danger" />
-                          </Button>
+                            <SelectTrigger id="role-filter" className="mt-1">
+                              <SelectValue placeholder="Select role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Roles</SelectItem>
+                              {Object.values(UserRole).map(role => (
+                                <SelectItem key={role} value={role}>{role}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                        
+                        <div className="p-2">
+                          <Label htmlFor="region-filter" className="text-xs">Region</Label>
+                          <Select 
+                            value={filterRegion} 
+                            onValueChange={setFilterRegion}
+                          >
+                            <SelectTrigger id="region-filter" className="mt-1">
+                              <SelectValue placeholder="Select region" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Regions</SelectItem>
+                              {uniqueRegions.map(region => (
+                                <SelectItem key={region} value={region || ''}>{region}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => {
+                          setFilterRole('all');
+                          setFilterRegion('all');
+                        }}>
+                          Reset Filters
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              </Tabs>
+            </div>
+            
+            <div className="border rounded-md overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-muted">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        <button 
+                          className="flex items-center"
+                          onClick={() => handleSort('name')}
+                        >
+                          Employee
+                          {sortField === 'name' && (
+                            <ArrowUpDown size={14} className="ml-1" />
+                          )}
+                        </button>
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        <button 
+                          className="flex items-center"
+                          onClick={() => handleSort('role')}
+                        >
+                          Role
+                          {sortField === 'role' && (
+                            <ArrowUpDown size={14} className="ml-1" />
+                          )}
+                        </button>
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        <button 
+                          className="flex items-center"
+                          onClick={() => handleSort('territory')}
+                        >
+                          Territory
+                          {sortField === 'territory' && (
+                            <ArrowUpDown size={14} className="ml-1" />
+                          )}
+                        </button>
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        <button 
+                          className="flex items-center"
+                          onClick={() => handleSort('status')}
+                        >
+                          Status
+                          {sortField === 'status' && (
+                            <ArrowUpDown size={14} className="ml-1" />
+                          )}
+                        </button>
+                      </th>
+                      <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {sortedEmployees.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-4 py-4 text-center text-sm text-muted-foreground">
+                          No employees found
+                        </td>
+                      </tr>
+                    ) : (
+                      sortedEmployees.map(employee => (
+                        <tr key={employee.id} className="hover:bg-muted/50">
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <Avatar className="h-8 w-8 mr-2">
+                                <AvatarImage src={employee.avatar} alt={employee.name} />
+                                <AvatarFallback>{employee.name.charAt(0)}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <div className="font-medium">{employee.name}</div>
+                                <div className="text-sm text-muted-foreground">{employee.email}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm">
+                            {employee.role}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm">
+                            {employee.territory ? (
+                              <div>
+                                <div>{employee.territory}</div>
+                                {employee.region && (
+                                  <div className="text-xs text-muted-foreground">{employee.region} Region</div>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">Not assigned</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <Badge 
+                              variant={
+                                employee.status === 'active' ? 'default' : 
+                                employee.status === 'inactive' ? 'destructive' : 
+                                'outline'
+                              }
+                              className={
+                                employee.status === 'active' ? 'bg-green-500' : 
+                                employee.status === 'inactive' ? 'bg-red-500' : 
+                                'bg-yellow-500'
+                              }
+                            >
+                              {employee.status.charAt(0).toUpperCase() + employee.status.slice(1)}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-right text-sm">
+                            <div className="flex justify-end space-x-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => navigate(`/profile/${employee.id}`)}
+                              >
+                                View
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => openEditDialog(employee)}
+                              >
+                                <Edit size={14} />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                onClick={() => openDeleteDialog(employee)}
+                              >
+                                <Trash2 size={14} />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </CardContent>
         </Card>
       </div>
+      
+      {/* Add Employee Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add New Employee</DialogTitle>
+            <DialogDescription>
+              Create a new employee profile. Fill in the details below.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleAddEmployee}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="name" className="text-right">
+                  Name *
+                </Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formState.name}
+                  onChange={handleFormChange}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="email" className="text-right">
+                  Email *
+                </Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formState.email}
+                  onChange={handleFormChange}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="role" className="text-right">
+                  Role *
+                </Label>
+                <Select
+                  value={formState.role?.toString()}
+                  onValueChange={(value) => handleSelectChange('role', value)}
+                >
+                  <SelectTrigger id="role" className="col-span-3">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(UserRole).map(role => (
+                      <SelectItem key={role} value={role}>{role}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="region" className="text-right">
+                  Region
+                </Label>
+                <Input
+                  id="region"
+                  name="region"
+                  value={formState.region}
+                  onChange={handleFormChange}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="territory" className="text-right">
+                  Territory
+                </Label>
+                <Input
+                  id="territory"
+                  name="territory"
+                  value={formState.territory}
+                  onChange={handleFormChange}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="status" className="text-right">
+                  Status
+                </Label>
+                <Select
+                  value={formState.status}
+                  onValueChange={(value) => handleSelectChange('status', value)}
+                >
+                  <SelectTrigger id="status" className="col-span-3">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Add Employee</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Employee Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Employee</DialogTitle>
+            <DialogDescription>
+              Update the employee's information.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleUpdateEmployee}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-name" className="text-right">
+                  Name *
+                </Label>
+                <Input
+                  id="edit-name"
+                  name="name"
+                  value={formState.name}
+                  onChange={handleFormChange}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-email" className="text-right">
+                  Email *
+                </Label>
+                <Input
+                  id="edit-email"
+                  name="email"
+                  type="email"
+                  value={formState.email}
+                  onChange={handleFormChange}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-role" className="text-right">
+                  Role *
+                </Label>
+                <Select
+                  value={formState.role?.toString()}
+                  onValueChange={(value) => handleSelectChange('role', value)}
+                >
+                  <SelectTrigger id="edit-role" className="col-span-3">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.values(UserRole).map(role => (
+                      <SelectItem key={role} value={role}>{role}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-region" className="text-right">
+                  Region
+                </Label>
+                <Input
+                  id="edit-region"
+                  name="region"
+                  value={formState.region}
+                  onChange={handleFormChange}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-territory" className="text-right">
+                  Territory
+                </Label>
+                <Input
+                  id="edit-territory"
+                  name="territory"
+                  value={formState.territory}
+                  onChange={handleFormChange}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="edit-status" className="text-right">
+                  Status
+                </Label>
+                <Select
+                  value={formState.status}
+                  onValueChange={(value) => handleSelectChange('status', value)}
+                >
+                  <SelectTrigger id="edit-status" className="col-span-3">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Update Employee</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete {selectedEmployee?.name}? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteEmployee}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
