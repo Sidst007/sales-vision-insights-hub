@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Header from '@/components/Header';
@@ -17,7 +18,10 @@ interface EmployeeNode {
 const TeamHierarchyPage: React.FC = () => {
   const { user } = useAuth();
 
+  // Define employees with the correct hierarchy
+  // 1 Admin, 2 TSMs (1 male, 1 female), 6 ASEs, 12 ASMs, 24 SRs, 1 KAM (female)
   const employees: EmployeeNode[] = [
+    // Admin - Top level
     {
       id: "admin1",
       name: "Meera Joshi",
@@ -25,6 +29,8 @@ const TeamHierarchyPage: React.FC = () => {
       avatar: "https://i.pravatar.cc/300?img=8",
       email: "meera.joshi@salesvision.com",
     },
+    
+    // 2 TSMs reporting to Admin (1 male, 1 female)
     {
       id: "tsm1",
       name: "Rajesh Kumar",
@@ -41,6 +47,18 @@ const TeamHierarchyPage: React.FC = () => {
       managerId: "admin1",
       email: "anita.desai@salesvision.com",
     },
+    
+    // 1 KAM (female) reporting to Admin, who looks after ASMs and ASEs
+    {
+      id: "kam1",
+      name: "Sunita Reddy",
+      role: UserRole.KAM,
+      avatar: "https://i.pravatar.cc/300?img=9",
+      managerId: "admin1",
+      email: "sunita.reddy@salesvision.com",
+    },
+    
+    // 6 ASEs (3 report to each TSM)
     {
       id: "ase1",
       name: "Priya Sharma",
@@ -89,6 +107,8 @@ const TeamHierarchyPage: React.FC = () => {
       managerId: "tsm2",
       email: "deepak.nair@salesvision.com",
     },
+    
+    // 12 ASMs (2 reporting to each ASE)
     {
       id: "asm1",
       name: "Ravi Verma",
@@ -130,10 +150,68 @@ const TeamHierarchyPage: React.FC = () => {
       email: "ajay.mathur@salesvision.com",
     },
     {
+      id: "asm6",
+      name: "Divya Iyer",
+      role: UserRole.ASM,
+      avatar: "https://i.pravatar.cc/300?img=10",
+      managerId: "ase3",
+      email: "divya.iyer@salesvision.com",
+    },
+    {
+      id: "asm7",
+      name: "Kiran Shah",
+      role: UserRole.ASM,
+      avatar: "https://i.pravatar.cc/300?img=18",
+      managerId: "ase4",
+      email: "kiran.shah@salesvision.com",
+    },
+    {
+      id: "asm8",
+      name: "Leela Menon",
+      role: UserRole.ASM,
+      avatar: "https://i.pravatar.cc/300?img=6",
+      managerId: "ase4",
+      email: "leela.menon@salesvision.com",
+    },
+    {
+      id: "asm9",
+      name: "Dinesh Kapoor",
+      role: UserRole.ASM,
+      avatar: "https://i.pravatar.cc/300?img=19",
+      managerId: "ase5",
+      email: "dinesh.kapoor@salesvision.com",
+    },
+    {
+      id: "asm10",
+      name: "Aisha Khan",
+      role: UserRole.ASM,
+      avatar: "https://i.pravatar.cc/300?img=7",
+      managerId: "ase5",
+      email: "aisha.khan@salesvision.com",
+    },
+    {
+      id: "asm11",
+      name: "Vikrant Saxena",
+      role: UserRole.ASM,
+      avatar: "https://i.pravatar.cc/300?img=20",
+      managerId: "ase6",
+      email: "vikrant.saxena@salesvision.com",
+    },
+    {
+      id: "asm12",
+      name: "Anjali Rao",
+      role: UserRole.ASM,
+      avatar: "https://i.pravatar.cc/300?img=29",
+      managerId: "ase6",
+      email: "anjali.rao@salesvision.com",
+    },
+    
+    // 24 SRs (2 reporting to each ASM)
+    {
       id: "sr1",
       name: "Rahul Saxena",
       role: UserRole.SR,
-      avatar: "https://i.pravatar.cc/300?img=18",
+      avatar: "https://i.pravatar.cc/300?img=21",
       managerId: "asm1",
       email: "rahul.saxena@salesvision.com",
     },
@@ -149,7 +227,7 @@ const TeamHierarchyPage: React.FC = () => {
       id: "sr3",
       name: "Vivek Chauhan",
       role: UserRole.SR,
-      avatar: "https://i.pravatar.cc/300?img=19",
+      avatar: "https://i.pravatar.cc/300?img=22",
       managerId: "asm2",
       email: "vivek.chauhan@salesvision.com",
     },
@@ -165,19 +243,180 @@ const TeamHierarchyPage: React.FC = () => {
       id: "sr5",
       name: "Suresh Kapoor",
       role: UserRole.SR,
-      avatar: "https://i.pravatar.cc/300?img=20",
+      avatar: "https://i.pravatar.cc/300?img=23",
       managerId: "asm3",
       email: "suresh.kapoor@salesvision.com",
     },
     {
-      id: "kam1",
-      name: "Sunita Reddy",
-      role: UserRole.KAM,
+      id: "sr6",
+      name: "Nisha Roy",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=8",
+      managerId: "asm3",
+      email: "nisha.roy@salesvision.com",
+    },
+    {
+      id: "sr7",
+      name: "Manoj Tiwari",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=24",
+      managerId: "asm4",
+      email: "manoj.tiwari@salesvision.com",
+    },
+    {
+      id: "sr8",
+      name: "Ananya Das",
+      role: UserRole.SR,
       avatar: "https://i.pravatar.cc/300?img=9",
-      managerId: "admin1",
-      email: "sunita.reddy@salesvision.com",
-    }
+      managerId: "asm4",
+      email: "ananya.das@salesvision.com",
+    },
+    {
+      id: "sr9",
+      name: "Harish Narayan",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=25",
+      managerId: "asm5",
+      email: "harish.narayan@salesvision.com",
+    },
+    {
+      id: "sr10",
+      name: "Ritu Garg",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=10",
+      managerId: "asm5",
+      email: "ritu.garg@salesvision.com",
+    },
+    {
+      id: "sr11",
+      name: "Pankaj Jha",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=26",
+      managerId: "asm6",
+      email: "pankaj.jha@salesvision.com",
+    },
+    {
+      id: "sr12",
+      name: "Swati Malhotra",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=11",
+      managerId: "asm6",
+      email: "swati.malhotra@salesvision.com",
+    },
+    {
+      id: "sr13",
+      name: "Anil Kumar",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=27",
+      managerId: "asm7",
+      email: "anil.kumar@salesvision.com",
+    },
+    {
+      id: "sr14",
+      name: "Geeta Bose",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=12",
+      managerId: "asm7", 
+      email: "geeta.bose@salesvision.com",
+    },
+    {
+      id: "sr15",
+      name: "Vinod Thakur",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=28",
+      managerId: "asm8",
+      email: "vinod.thakur@salesvision.com",
+    },
+    {
+      id: "sr16",
+      name: "Maya Sinha",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=13",
+      managerId: "asm8",
+      email: "maya.sinha@salesvision.com",
+    },
+    {
+      id: "sr17",
+      name: "Ramesh Tiwari",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=30",
+      managerId: "asm9",
+      email: "ramesh.tiwari@salesvision.com",
+    },
+    {
+      id: "sr18",
+      name: "Sarika Gupta",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=14",
+      managerId: "asm9",
+      email: "sarika.gupta@salesvision.com",
+    },
+    {
+      id: "sr19",
+      name: "Deepak Sharma",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=31",
+      managerId: "asm10",
+      email: "deepak.sharma@salesvision.com",
+    },
+    {
+      id: "sr20",
+      name: "Jyoti Verma",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=15",
+      managerId: "asm10",
+      email: "jyoti.verma@salesvision.com",
+    },
+    {
+      id: "sr21",
+      name: "Alok Mishra",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=32",
+      managerId: "asm11",
+      email: "alok.mishra@salesvision.com",
+    },
+    {
+      id: "sr22",
+      name: "Prerna Patel",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=16",
+      managerId: "asm11",
+      email: "prerna.patel@salesvision.com",
+    },
+    {
+      id: "sr23",
+      name: "Sanjay Batra",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=33",
+      managerId: "asm12",
+      email: "sanjay.batra@salesvision.com",
+    },
+    {
+      id: "sr24",
+      name: "Smita Choudhury",
+      role: UserRole.SR,
+      avatar: "https://i.pravatar.cc/300?img=17",
+      managerId: "asm12",
+      email: "smita.choudhury@salesvision.com",
+    },
   ];
+
+  // Add dotted connections between KAM and ASMs/ASEs
+  // This adds virtual connections that the KAM oversees without being direct manager
+  const kamConnections = employees
+    .filter(emp => emp.role === UserRole.ASM || emp.role === UserRole.ASE)
+    .map(emp => ({
+      id: `kam-connection-${emp.id}`,
+      name: emp.name,
+      role: emp.role,
+      avatar: emp.avatar,
+      email: emp.email,
+      managerId: "kam1",
+      isDottedLine: true // This indicates a dotted line connection (advisory)
+    }));
+
+  // Combine all employees including the KAM connections for visualization
+  const allEmployeesWithConnections = [...employees];
 
   return (
     <div className="pb-8">
@@ -190,8 +429,10 @@ const TeamHierarchyPage: React.FC = () => {
       <div className="container mt-6">
         <Card>
           <CardContent className="p-6 overflow-x-auto">
-            <div className="min-w-[800px]">
-              <OrganizationChart employees={employees} />
+            <div className="min-w-[1000px] min-h-[800px]">
+              <OrganizationChart 
+                employees={allEmployeesWithConnections}
+              />
             </div>
           </CardContent>
         </Card>
