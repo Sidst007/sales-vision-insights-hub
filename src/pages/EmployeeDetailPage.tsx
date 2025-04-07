@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
@@ -44,6 +45,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
 
 interface TeamMember {
   id: string;
@@ -66,6 +68,7 @@ const EmployeeDetailPage: React.FC = () => {
   const { employeeId } = useParams<{ employeeId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [isSaving, setIsSaving] = useState(false);
   
   const teamData = generateTeamData();
   const employeeData = teamData.find(member => member.id === employeeId);
@@ -121,6 +124,14 @@ const EmployeeDetailPage: React.FC = () => {
     });
   };
   
+  const handleSaveData = () => {
+    setIsSaving(true);
+    setTimeout(() => {
+      setIsSaving(false);
+      toast.success("Data saved successfully");
+    }, 800);
+  };
+  
   const monthlyData = generateMonthlyData();
   const dailyData = generateDailyData();
   const comparisonData = generateComparisonData();
@@ -133,13 +144,20 @@ const EmployeeDetailPage: React.FC = () => {
         showExport
       />
       
-      <main className="dashboard-layout">
+      <main className="dashboard-layout container pb-8">
         <div className="flex justify-between mb-4">
           <Button
             variant="outline"
             onClick={() => navigate('/team')}
           >
             Back to Team
+          </Button>
+          
+          <Button
+            onClick={handleSaveData}
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving..." : "Save Data"}
           </Button>
         </div>
         
@@ -211,45 +229,38 @@ const EmployeeDetailPage: React.FC = () => {
               <CardTitle>Monthly Performance Trend</CardTitle>
               <CardDescription>Performance vs target over time</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <ChartContainer 
-                  config={{
-                    performance: {
-                      label: "Performance",
-                      color: "#0F52BA"
-                    },
-                    target: {
-                      label: "Target",
-                      color: "#FF6B6B"
-                    }
-                  }}
-                >
+            <CardContent className="px-2 pt-2 pb-4">
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={monthlyData}
-                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    margin={{ top: 10, right: 20, left: 10, bottom: 15 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" />
-                    <YAxis domain={[0, 120]} />
-                    <ChartTooltip
-                      content={<ChartTooltipContent />}
+                    <YAxis domain={[0, 120]} width={35} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
+                      formatter={(value) => [value, '']}
+                      labelFormatter={(label) => `Month: ${label}`}
                     />
-                    <Legend />
+                    <Legend verticalAlign="top" height={36} />
                     <Line 
                       type="monotone" 
                       dataKey="performance" 
+                      name="Performance" 
                       stroke="#0F52BA" 
                       activeDot={{ r: 8 }} 
                     />
                     <Line 
                       type="monotone" 
                       dataKey="target" 
+                      name="Target" 
                       stroke="#FF6B6B" 
                       strokeDasharray="5 5" 
                     />
                   </LineChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
@@ -358,19 +369,22 @@ const EmployeeDetailPage: React.FC = () => {
               <CardTitle>Weekly Activity</CardTitle>
               <CardDescription>Daily calls, meetings and sales performance</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-72">
-                <ChartContainer config={{}}>
+            <CardContent className="px-2 pt-2 pb-4">
+              <div className="h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
                   <LineChart
                     data={dailyData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    margin={{ top: 20, right: 30, left: 10, bottom: 15 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="day" />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Legend />
+                    <YAxis yAxisId="left" width={35} />
+                    <YAxis yAxisId="right" orientation="right" width={35} />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
+                      formatter={(value, name) => [value, name]}
+                    />
+                    <Legend verticalAlign="top" height={36} />
                     <Line 
                       yAxisId="left"
                       type="monotone" 
@@ -394,7 +408,7 @@ const EmployeeDetailPage: React.FC = () => {
                       stroke="#FF6B6B" 
                     />
                   </LineChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
@@ -404,23 +418,26 @@ const EmployeeDetailPage: React.FC = () => {
               <CardTitle>Performance Against Team Average</CardTitle>
               <CardDescription>Comparison across key performance indicators</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="h-72">
-                <ChartContainer config={{}}>
+            <CardContent className="px-2 pt-2 pb-4">
+              <div className="h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={comparisonData}
                     layout="vertical"
-                    margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
+                    margin={{ top: 20, right: 30, left: 80, bottom: 15 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" domain={[0, 100]} />
                     <YAxis dataKey="category" type="category" width={80} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Legend />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: 'white', border: '1px solid #ccc' }}
+                      formatter={(value, name) => [value, name]}
+                    />
+                    <Legend verticalAlign="top" height={36} />
                     <Bar dataKey="employee" name="Employee" fill="#0F52BA" />
                     <Bar dataKey="teamAverage" name="Team Average" fill="#FF6B6B" />
                   </BarChart>
-                </ChartContainer>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>

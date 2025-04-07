@@ -13,6 +13,8 @@ interface EmployeeNode {
   avatar: string;
   email: string;
   managerId?: string;
+  isDottedLine?: boolean;
+  performance?: number;
 }
 
 const TeamHierarchyPage: React.FC = () => {
@@ -412,11 +414,18 @@ const TeamHierarchyPage: React.FC = () => {
       avatar: emp.avatar,
       email: emp.email,
       managerId: "kam1",
-      isDottedLine: true // This indicates a dotted line connection (advisory)
+      isDottedLine: true, // This indicates a dotted line connection (advisory)
+      performance: Math.floor(Math.random() * 15) + 85 // Random performance between 85-100
     }));
 
   // Combine all employees including the KAM connections for visualization
   const allEmployeesWithConnections = [...employees];
+
+  // Add performance data to all employees for visualization
+  const employeesWithPerformance = allEmployeesWithConnections.map(emp => ({
+    ...emp,
+    performance: emp.performance || Math.floor(Math.random() * 15) + 85 // Add random performance if not set
+  }));
 
   return (
     <div className="pb-8">
@@ -431,7 +440,7 @@ const TeamHierarchyPage: React.FC = () => {
           <CardContent className="p-6 overflow-x-auto">
             <div className="min-w-[1000px] min-h-[800px]">
               <OrganizationChart 
-                employees={allEmployeesWithConnections}
+                employees={employeesWithPerformance}
               />
             </div>
           </CardContent>

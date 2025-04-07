@@ -33,7 +33,7 @@ export const OrganizationChart: React.FC<OrganizationChartProps> = ({ employees 
   
   // Get direct reports for an employee
   const getDirectReports = (employeeId: string) => {
-    return employees.filter(e => e.managerId === employeeId && !e.isDottedLine);
+    return employees.filter(e => e.managerId === employeeId && e.isDottedLine !== true);
   };
   
   // Get KAM's connections (dotted lines)
@@ -74,12 +74,12 @@ export const OrganizationChart: React.FC<OrganizationChartProps> = ({ employees 
     
     // Different styling based on level
     const nodeSize = level === 0 
-      ? 'w-48 h-28' 
+      ? 'w-52 h-32' 
       : level === 1 
-        ? 'w-40 h-24' 
+        ? 'w-44 h-28' 
         : level === 2 
-          ? 'w-36 h-20' 
-          : 'w-32 h-18';
+          ? 'w-40 h-24' 
+          : 'w-36 h-22';
           
     const bgColor = level === 0 
       ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200' 
@@ -99,16 +99,16 @@ export const OrganizationChart: React.FC<OrganizationChartProps> = ({ employees 
             <Tooltip>
               <TooltipTrigger asChild>
                 <Card 
-                  className={`${nodeSize} p-2 ${bgColor} shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col justify-between mx-2 mb-2 rounded-lg`}
+                  className={`${nodeSize} p-3 ${bgColor} shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col justify-between mx-2 mb-2 rounded-lg`}
                   onClick={() => navigate(`/employee/${employee.id}`)}
                 >
                   <CardContent className="p-0 flex items-center h-full">
                     <div className="flex items-start w-full">
-                      <Avatar className={level === 0 ? "h-12 w-12 mr-3 border-2 border-primary" : "h-8 w-8 mr-2"}>
+                      <Avatar className={level === 0 ? "h-12 w-12 mr-3 border-2 border-primary" : "h-10 w-10 mr-2"}>
                         <AvatarImage src={employee.avatar} alt={employee.name} />
                         <AvatarFallback>{employee.name.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 overflow-hidden">
                         <div className={`font-medium truncate ${level === 0 ? 'text-base' : 'text-sm'}`}>
                           {employee.name}
                         </div>
