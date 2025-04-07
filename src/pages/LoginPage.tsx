@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import backgroundImage from './backdrop.png';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,14 +65,19 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-sales-lightest to-white p-4">
+    <div 
+      className="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+      }}
+    >
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gradient mb-2">SalesVision</h1>
           <p className="text-muted-foreground">Insights Hub for FMCG Sales Teams</p>
         </div>
         
-        <Card className="border-t-4 border-t-sales-primary shadow-lg animate-fade-in">
+        <Card className="border-t-4 border-t-sales-primary shadow-lg animate-fade-in bg-white/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle>Sign In</CardTitle>
             <CardDescription>
