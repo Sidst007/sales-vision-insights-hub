@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -28,43 +28,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { formatPercentage, formatCurrency } from '@/utils/data-utils';
-import { Calendar, Phone, FileText, Users, Target, Trash2 } from 'lucide-react';
-import { 
-  saveSalesData, 
-  getUserSalesData, 
-  deleteSalesData, 
-  SavedSalesData,
-  canDeleteData
-} from '@/utils/data-storage';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Calendar, Phone, FileText, Users, Target } from 'lucide-react';
 
 // Define form schema
 const formSchema = z.object({
@@ -87,7 +51,7 @@ const DataInputPage: React.FC = () => {
     newAccounts: 2
   });
   
-  const [savedEntries, setSavedEntries] = useState<SavedSalesData[]>([]);
+  // Get current day's metrics (this would be fetched from your API/database in a real app)
   const [currentMetrics, setCurrentMetrics] = useState({
     calls: 0,
     meetings: 0,
@@ -107,50 +71,14 @@ const DataInputPage: React.FC = () => {
     }
   });
 
-  // Load saved data on component mount
-  useEffect(() => {
-    if (user) {
-      const userData = getUserSalesData(user.id);
-      setSavedEntries(userData);
-      
-      // Calculate current metrics from saved data
-      const totals = userData.reduce((acc, entry) => {
-        return {
-          calls: acc.calls + entry.callsMade,
-          meetings: acc.meetings + entry.meetings,
-          salesAmount: acc.salesAmount + entry.salesAmount,
-          newAccounts: acc.newAccounts + entry.newAccounts
-        };
-      }, { calls: 0, meetings: 0, salesAmount: 0, newAccounts: 0 });
-      
-      setCurrentMetrics(totals);
-    }
-  }, [user]);
-
   // Submit handler
   const onSubmit = (data: FormValues) => {
-    if (!user) {
-      toast.error('You must be logged in to submit data');
-      return;
-    }
-    
     setIsSubmitting(true);
     
-    try {
-      // Save data to storage
-      const savedData = saveSalesData({
-        userId: user.id,
-        callsMade: data.callsMade,
-        meetings: data.meetings,
-        salesAmount: data.salesAmount,
-        newAccounts: data.newAccounts,
-        notes: data.notes
-      });
-      
-      // Update local state
-      setSavedEntries(prev => [...prev, savedData]);
-      
-      // Update current metrics
+    // This is where you would send the data to your backend
+    // For now, we'll simulate a successful submission
+    setTimeout(() => {
+      // Update current metrics with the parsed number values from the form
       setCurrentMetrics(prev => ({
         calls: prev.calls + data.callsMade,
         meetings: prev.meetings + data.meetings,
@@ -167,48 +95,14 @@ const DataInputPage: React.FC = () => {
         notes: ""
       });
       
-      toast.success('Your sales data has been saved successfully');
-    } catch (error) {
-      console.error('Error saving data:', error);
-      toast.error('Failed to save your data. Please try again.');
-    } finally {
+      toast.success('Your sales data has been submitted successfully');
       setIsSubmitting(false);
-    }
-  };
-
-  // Handle delete entry
-  const handleDeleteEntry = (entryId: string) => {
-    if (deleteSalesData(entryId)) {
-      // Update local state after deletion
-      const deletedEntry = savedEntries.find(entry => entry.id === entryId);
-      
-      if (deletedEntry) {
-        // Remove from saved entries
-        setSavedEntries(prev => prev.filter(entry => entry.id !== entryId));
-        
-        // Update metrics
-        setCurrentMetrics(prev => ({
-          calls: prev.calls - deletedEntry.callsMade,
-          meetings: prev.meetings - deletedEntry.meetings,
-          salesAmount: prev.salesAmount - deletedEntry.salesAmount,
-          newAccounts: prev.newAccounts - deletedEntry.newAccounts
-        }));
-        
-        toast.success('Entry deleted successfully');
-      }
-    } else {
-      toast.error('Failed to delete entry');
-    }
+    }, 1500);
   };
 
   // Calculate progress percentages
   const getProgress = (current: number, target: number) => {
     return Math.min((current / target) * 100, 100);
-  };
-
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
   };
 
   return (
@@ -218,7 +112,7 @@ const DataInputPage: React.FC = () => {
         subtitle={`${user?.role} - Daily Sales Tracker`} 
       />
       
-      <main className="dashboard-layout p-4">
+      <main className="dashboard-layout">
         {/* Daily Progress Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card className="card-hover">
@@ -291,7 +185,7 @@ const DataInputPage: React.FC = () => {
         </div>
         
         {/* Data Input Form */}
-        <Card className="mb-6">
+        <Card>
           <CardHeader>
             <CardTitle>Record Your Sales Activities</CardTitle>
             <CardDescription>Enter details about your calls, meetings, and sales for today</CardDescription>
@@ -383,96 +277,11 @@ const DataInputPage: React.FC = () => {
                     disabled={isSubmitting} 
                     className="w-full md:w-auto"
                   >
-                    {isSubmitting ? 'Saving...' : 'Save Sales Data'}
+                    {isSubmitting ? 'Saving...' : 'Submit Sales Data'}
                   </Button>
                 </CardFooter>
               </form>
             </Form>
-          </CardContent>
-        </Card>
-        
-        {/* Saved Entries Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Sales Activity History</CardTitle>
-            <CardDescription>Review and manage your previously recorded sales activities</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {savedEntries.length > 0 ? (
-              <Table>
-                <TableCaption>A list of your recorded sales activities</TableCaption>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Calls</TableHead>
-                    <TableHead>Meetings</TableHead>
-                    <TableHead>Sales Amount</TableHead>
-                    <TableHead>New Accounts</TableHead>
-                    <TableHead>Notes</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {savedEntries.map((entry) => (
-                    <TableRow key={entry.id}>
-                      <TableCell>{formatDate(entry.date)}</TableCell>
-                      <TableCell>{entry.callsMade}</TableCell>
-                      <TableCell>{entry.meetings}</TableCell>
-                      <TableCell>{formatCurrency(entry.salesAmount)}</TableCell>
-                      <TableCell>{entry.newAccounts}</TableCell>
-                      <TableCell className="max-w-[200px] truncate">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="link" size="sm" className="h-auto p-0">
-                              {entry.notes ? (entry.notes.length > 20 ? entry.notes.substring(0, 20) + '...' : entry.notes) : 'No notes'}
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Entry Notes</DialogTitle>
-                              <DialogDescription>Date: {formatDate(entry.date)}</DialogDescription>
-                            </DialogHeader>
-                            <div className="mt-4">
-                              {entry.notes || 'No notes were added for this entry.'}
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete this entry?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will permanently remove this sales activity record. This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDeleteEntry(entry.id)}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                No sales activity records found. Start by adding your first entry above.
-              </div>
-            )}
           </CardContent>
         </Card>
       </main>

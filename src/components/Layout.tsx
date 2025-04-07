@@ -15,7 +15,7 @@ const Layout: React.FC = () => {
   const roleBasedPaths = {
     [UserRole.ADMIN]: ['/dashboard', '/owner-dashboard', '/team', '/team-hierarchy', '/targets', '/compensation', 
                        '/accounts', '/products', '/reports', '/profile', '/settings', '/comparison', 
-                       '/employee', '/data-input', '/employee-management', '/profile', '/admin-data'],
+                       '/employee', '/data-input', '/employee-management', '/profile'],
     [UserRole.TSM]: ['/dashboard', '/team', '/team-hierarchy', '/targets', '/compensation', '/accounts', 
                     '/products', '/reports', '/profile', '/data-input', '/employee', '/profile'],
     [UserRole.ASE]: ['/dashboard', '/team', '/team-hierarchy', '/targets', '/compensation', '/products', 

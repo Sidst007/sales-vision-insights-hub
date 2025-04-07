@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,7 +18,6 @@ import ComparisonPage from "./pages/ComparisonPage";
 import EmployeeManagementPage from "./pages/EmployeeManagementPage";
 import TeamHierarchyPage from "./pages/TeamHierarchyPage";
 import ProfileDetailPage from "./pages/ProfileDetailPage";
-import AdminDataPage from './pages/AdminDataPage';
 
 const queryClient = new QueryClient();
 
@@ -41,7 +41,6 @@ const App = () => (
               <Route path="/profile/:employeeId" element={<ProfileDetailPage />} />
               <Route path="/comparison" element={<ComparisonPage />} />
               <Route path="/employee-management" element={<EmployeeManagementPage />} />
-              <Route path="/admin-data" element={<AdminDataPage />} />
               {/* Placeholder routes for future implementation */}
               <Route path="/analytics" element={<DashboardPage />} />
               <Route path="/targets" element={<DashboardPage />} />
