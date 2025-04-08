@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import AdminDataControl from '@/components/AdminDataControl';
 import { Navigate } from 'react-router-dom';
 import TeamHierarchyPage from '@/pages/TeamHierarchyPage';
+import { generateTeamData } from '@/data/mockData';
 
 const AdminDataPage: React.FC = () => {
   const { user } = useAuth();
@@ -15,9 +16,8 @@ const AdminDataPage: React.FC = () => {
     return <Navigate to="/dashboard" replace />;
   }
   
-  // Get employees from TeamHierarchyPage data
-  const hierarchyPageInstance = new TeamHierarchyPage({});
-  const employees = hierarchyPageInstance.render().props.children[1].props.children.props.children.props.children.props.employees;
+  // Get employees data from the mock data generator
+  const employees = generateTeamData();
 
   return (
     <div className="pb-8">

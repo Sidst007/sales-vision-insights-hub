@@ -32,7 +32,7 @@ const LoginPage: React.FC = () => {
       // Create a full user object with required properties
       const mockUser = {
         id: `user-${Date.now()}`,
-        name: demoUser.email.split('@')[0],
+        name: demoUser.displayName, // Use the displayName instead of email prefix
         email: demoUser.email,
         role: demoUser.role,
         avatar: '',
@@ -48,31 +48,37 @@ const LoginPage: React.FC = () => {
     { 
       role: UserRole.ADMIN, 
       email: 'admin@example.com',
+      displayName: 'Meera Joshi',
       description: 'Full access to all features and dashboards'
     },
     { 
       role: UserRole.TSM, 
       email: 'tsm1@example.com',
+      displayName: 'Rajesh Kumar',
       description: 'Manage territory sales teams and targets'
     },
     { 
       role: UserRole.ASE, 
       email: 'ase1@example.com',
+      displayName: 'Priya Sharma',
       description: 'Handle area-level sales operations'
     },
     { 
       role: UserRole.ASM, 
       email: 'asm1@example.com',
+      displayName: 'Vikram Singh',
       description: 'Manage sales teams within specific areas'
     },
     { 
       role: UserRole.SR, 
       email: 'sr1@example.com',
+      displayName: 'Amit Patel',
       description: 'Track individual sales performance and tasks'
     },
     { 
       role: UserRole.KAM, 
       email: 'kam@example.com',
+      displayName: 'Neha Gupta',
       description: 'Manage key client accounts and relationships'
     }
   ];
