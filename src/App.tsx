@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +19,8 @@ import EmployeeManagementPage from "./pages/EmployeeManagementPage";
 import TeamHierarchyPage from "./pages/TeamHierarchyPage";
 import ProfileDetailPage from "./pages/ProfileDetailPage";
 import AdminDataPage from './pages/AdminDataPage';
+import ProductsPage from './pages/ProductsPage';
+import ReportsPage from './pages/ReportsPage';
 
 const queryClient = new QueryClient();
 
@@ -42,13 +45,13 @@ const App = () => (
               <Route path="/comparison" element={<ComparisonPage />} />
               <Route path="/employee-management" element={<EmployeeManagementPage />} />
               <Route path="/admin-data" element={<AdminDataPage />} />
-              {/* Placeholder routes for future implementation */}
-              <Route path="/analytics" element={<DashboardPage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              {/* Updated routes with proper pages */}
               <Route path="/targets" element={<DashboardPage />} />
               <Route path="/compensation" element={<DashboardPage />} />
               <Route path="/accounts" element={<DashboardPage />} />
-              <Route path="/products" element={<DashboardPage />} />
-              <Route path="/reports" element={<DashboardPage />} />
+              <Route path="/analytics" element={<DashboardPage />} />
               <Route path="/settings" element={<DashboardPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />

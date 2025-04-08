@@ -5,7 +5,6 @@ import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminDataControl from '@/components/AdminDataControl';
 import { Navigate } from 'react-router-dom';
-import TeamHierarchyPage from '@/pages/TeamHierarchyPage';
 import { generateTeamData } from '@/data/mockData';
 
 const AdminDataPage: React.FC = () => {
@@ -17,7 +16,16 @@ const AdminDataPage: React.FC = () => {
   }
   
   // Get employees data from the mock data generator
-  const employees = generateTeamData();
+  // Convert TeamMember to User by mapping and adding required fields
+  const teamMembers = generateTeamData();
+  const employees = teamMembers.map(member => ({
+    id: member.id,
+    name: member.name,
+    role: member.role as UserRole,
+    email: member.email || `${member.name.toLowerCase().replace(/\s+/g, '.')}@company.com`,
+    avatar: member.avatar || '',
+    territory: member.region
+  }));
 
   return (
     <div className="pb-8">
