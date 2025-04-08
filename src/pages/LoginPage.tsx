@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import backgroundImage from './backdrop.png';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
@@ -23,7 +24,24 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
+    
+    // Create a mock user based on the email for demonstration
+    const demoUser = demoUsers.find(user => user.email === email);
+    
+    if (demoUser && password === 'password') {
+      // Create a full user object with required properties
+      const mockUser = {
+        id: `user-${Date.now()}`,
+        name: demoUser.email.split('@')[0],
+        email: demoUser.email,
+        role: demoUser.role,
+        avatar: '',
+      };
+      
+      login(mockUser);
+    } else {
+      // In a real application, you would have proper authentication here
+    }
   };
 
   const demoUsers = [

@@ -5,7 +5,7 @@ import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AdminDataControl from '@/components/AdminDataControl';
 import { Navigate } from 'react-router-dom';
-import { TeamHierarchyPage } from '@/pages/TeamHierarchyPage';
+import TeamHierarchyPage from '@/pages/TeamHierarchyPage';
 
 const AdminDataPage: React.FC = () => {
   const { user } = useAuth();
